@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="robots" content="noindex">
+<meta name="robots" content="noindex, nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://esm.sh; connect-src https://mqjjlnpjldptrqmlbefg.supabase.co wss://mqjjlnpjldptrqmlbefg.supabase.co https://esm.sh; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<script>if (top !== self) top.location = self.location;</script>
 <meta name="theme-color" content="#2a2622">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Santé Agenda">
@@ -349,10 +352,10 @@ async function carregarAg(){
     const msg = encodeURIComponent(`Olá, ${a.nome.split(" ")[0]}! Aqui é da Santé Excellence 💛 Passando pra confirmar seu horário: ${a.servicos?.nome||"atendimento"} em ${br(a.data)} às ${hm(a.inicio)}. Podemos confirmar?`);
     const lis = /lis/i.test(a.observacao||"");
     const obs = a.observacao && !/^Agendado pela Lis no site$/i.test(a.observacao) ? a.observacao : "";
-    h += `<div class="ag ${a.status}">
+    h += `<div class="ag ${esc(a.status)}">
       <div class="hr"><b>${hm(a.inicio)}</b><span>até ${hm(a.fim)}</span></div>
       <div>
-        <div class="nm">${esc(a.nome)} <span class="tag ${a.status}">${a.status==="concluido"?"concluído":a.status}</span>${lis?'<span class="tag lis">Lis</span>':""}</div>
+        <div class="nm">${esc(a.nome)} <span class="tag ${esc(a.status)}">${a.status==="concluido"?"concluído":esc(a.status)}</span>${lis?'<span class="tag lis">Lis</span>':""}</div>
         <div class="pr">${esc(a.servicos?.nome||"")} · ${esc(a.telefone)}</div>
         ${obs?`<div class="ob">${esc(obs)}</div>`:""}
       </div>
@@ -461,7 +464,7 @@ async function carregarPd(){
   $("lpd").innerHTML = data.map(p => {
     const d = p.dados || {}, it = [];
     (d.produtos||[]).forEach(x => it.push("🧴 " + x));
-    if (d.total_produtos) it.push(`<b>Total dos produtos: ${esc(d.total_produtos)}</b>`);
+    if (d.total_produtos) it.push({b:"Total dos produtos: " + d.total_produtos});
     (d.procedimentos||[]).forEach(x => it.push("✨ " + x));
     (d.combos||[]).forEach(x => it.push("💎 Combo " + x));
     if (d.reserva) it.push(`📅 Agendou: ${d.reserva.servico} · ${br(d.reserva.data)} às ${d.reserva.hora}`);
@@ -472,10 +475,10 @@ async function carregarPd(){
     const tel = (p.telefone||"").replace(/\D/g,""), wpp = tel.length && tel.length<=11 ? "55"+tel : tel;
     const primeiro = (p.nome||"").split(" ")[0];
     const msg = encodeURIComponent(`Olá${primeiro?", "+primeiro:""}! Aqui é da Santé Excellence 💛 Vi seu pedido pelo site com a Lis. Posso te ajudar?`);
-    return `<div class="pd ${p.status}">
+    return `<div class="pd ${esc(p.status)}">
       <div class="hd"><div><div class="nm">${esc(p.nome || "Cliente sem nome")}</div>${p.telefone?`<div class="muted" style="font-size:14px">${esc(p.telefone)}</div>`:""}</div><div class="qd">${quando(p.criado_em)}</div></div>
-      <div class="tags"><span class="tag ${p.status}">${p.status}</span>${p.tipo?`<span class="tag lis">${esc(p.tipo)}</span>`:""}${p.enviado_whatsapp?'<span class="tag wa">mandou no WhatsApp</span>':""}</div>
-      ${it.length?`<ul>${it.map(x => `<li>${x.startsWith("<b>")?x:esc(x)}</li>`).join("")}</ul>`:""}
+      <div class="tags"><span class="tag ${esc(p.status)}">${esc(p.status)}</span>${p.tipo?`<span class="tag lis">${esc(p.tipo)}</span>`:""}${p.enviado_whatsapp?'<span class="tag wa">mandou no WhatsApp</span>':""}</div>
+      ${it.length?`<ul>${it.map(x => `<li>${typeof x==="object"?`<b>${esc(x.b)}</b>`:esc(x)}</li>`).join("")}</ul>`:""}
       ${p.conversa?`<details><summary>Ver conversa com a Lis</summary><pre>${esc(p.conversa)}</pre></details>`:""}
       ${p.resumo?`<details><summary>Mensagem do pedido</summary><pre>${esc(p.resumo)}</pre></details>`:""}
       <div class="acts">

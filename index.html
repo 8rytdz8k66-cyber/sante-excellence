@@ -922,7 +922,8 @@ function mensagem(){
 /* ======================= ATENDENTE ======================= */
 const msgs=$('#msgs'),zone=$('#zone');
 function fala(t,q='b'){const d=document.createElement('div');d.className='m '+q;d.textContent=t;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;return d}
-function opcoes(l){zone.innerHTML=`<div class="opts">${l.map((o,i)=>`<button class="opt${o.go?' go':''}" data-i="${i}">${o.t}</button>`).join('')}</div>`;zone.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{const o=l[b.dataset.i];fala(o.t,'u');zone.innerHTML='';setTimeout(o.f,300)})}
+const escH=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function opcoes(l){zone.innerHTML=`<div class="opts">${l.map((o,i)=>`<button class="opt${o.go?' go':''}" data-i="${i}">${escH(o.t)}</button>`).join('')}</div>`;zone.querySelectorAll('[data-i]').forEach(b=>b.onclick=()=>{const o=l[b.dataset.i];fala(o.t,'u');zone.innerHTML='';setTimeout(o.f,300)})}
 function cards(lista,titulo){
   zone.innerHTML=`<div class="picks">${lista.map(p=>`<div class="pk"><div>${titulo?`<small>${titulo(p)}</small>`:''}<b>${p.nome}</b><span>${brl(p.preco)} · ${p.desc}</span></div><button class="opt${S.cart[p.id]?' on':''}" data-pk="${p.id}">${S.cart[p.id]?'✓':'Adicionar'}</button></div>`).join('')}</div>`;
   zone.querySelectorAll('[data-pk]').forEach(b=>b.onclick=()=>{const id=b.dataset.pk;if(S.cart[id])delete S.cart[id];else{S.cart[id]=1;mostrarDica(byId(id))}b.classList.toggle('on');b.textContent=S.cart[id]?'✓':'Adicionar';refresh()});
@@ -1143,7 +1144,7 @@ function revisao(){
   ${S.ment?`<div class="rl"><span>Mentoria A Chave da HOF</span></div>`:''}
   ${!it.length&&!S.procs.size&&!S.combos.size&&!S.ment&&!(S.agenda&&S.agenda.interesse)?`<p class="note">Você ainda não escolheu nada, mas pode mandar sua dúvida mesmo assim.</p>`:''}
   <p class="note">${S.agenda&&S.agenda.interesse?`📅 Avaliação: ${S.agenda.interesse} · preferência ${S.agenda.periodo.toLowerCase()}, ${S.agenda.quando.toLowerCase()}. A equipe confirma o dia e o horário pelo WhatsApp.`:'Dia e horário: combinados pelo WhatsApp.'}</p>
-  <input id="revTel" type="tel" inputmode="tel" autocomplete="tel" placeholder="Seu WhatsApp com DDD (opcional)" value="${S.telPedido||''}" style="width:100%;margin:10px 0;padding:12px 14px;border:1px solid rgba(0,0,0,.12);border-radius:14px;font:inherit;font-size:16px;background:#fff">
+  <input id="revTel" type="tel" inputmode="tel" autocomplete="tel" placeholder="Seu WhatsApp com DDD (opcional)" value="${escH(S.telPedido||'')}" style="width:100%;margin:10px 0;padding:12px 14px;border:1px solid rgba(0,0,0,.12);border-radius:14px;font:inherit;font-size:16px;background:#fff">
   <a class="btn wa" id="waSend" style="width:100%" href="${wa(mensagem())}" target="_blank" rel="noopener">Enviar no WhatsApp</a>
   <div class="opts" style="padding:12px 0 0"><button class="opt" id="mais">Escolher mais coisas</button></div></div>`;
   $('#revTel').addEventListener('input',e=>{S.telPedido=e.target.value.trim().slice(0,30)});
