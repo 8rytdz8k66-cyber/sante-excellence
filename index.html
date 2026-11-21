@@ -999,9 +999,70 @@ function salvarPedido(){
   };
   try{fetch(PLANILHA_URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(d)}).catch(()=>{})}catch(e){}
 }
-/* agendamento da avaliação */
+/* ===== agenda online (Supabase): horários livres de verdade ===== */
+const AGENDA={url:'https://mqjjlnpjldptrqmlbefg.supabase.co',key:'sb_publishable_4rv3YxI9SBYtOvNmZY3knw_ftFZijWV',dias:14,passo:30};
+const SEM=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+async function sbGet(path){const r=await fetch(`${AGENDA.url}/rest/v1/${path}`,{headers:{apikey:AGENDA.key}});if(!r.ok)throw new Error('agenda');return r.json()}
+async function sbRpc(fn,body){const r=await fetch(`${AGENDA.url}/rest/v1/rpc/${fn}`,{method:'POST',headers:{apikey:AGENDA.key,'Content-Type':'application/json'},body:JSON.stringify(body)});const t=await r.text();let j=null;try{j=JSON.parse(t)}catch(e){}if(!r.ok){const m=(j&&(j.message||j.hint))||'Não consegui reservar agora.';const e=new Error(m);e.negocio=!!(j&&j.message);throw e}return j}
+const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m};
+const toHHMM=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const brData=x=>{const[y,m,d]=x.split('-');return `${d}/${m}`};
+function agoraFortaleza(){const p=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Fortaleza',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date());const g=t=>p.find(x=>x.type===t).value;return{data:`${g('year')}-${g('month')}-${g('day')}`,min:(+g('hour')%24)*60+ +g('minute')}}
+let AG={servicos:null,horarios:{}};
+async function carregarAgenda(){if(AG.servicos)return;const[sv,hr]=await Promise.all([sbGet('servicos?select=*&ativo=eq.true&order=ordem'),sbGet('horarios_funcionamento?select=*')]);AG.servicos=sv;hr.forEach(h=>AG.horarios[h.dia_semana]=h)}
 function fluxoAgendar(){
-  if(!S.nome){fala('Vamos agendar sua avaliação! 💛 É rapidinho, só umas perguntinhas.\n\nPra começar, como posso te chamar?');S.esperaNome=true;S.depoisNome=fluxoAgendar;zone.innerHTML='';return}
+  if(!S.nome){fala('Vamos agendar seu horário! 💛 É rapidinho.\n\nPra começar, como posso te chamar?');S.esperaNome=true;S.depoisNome=fluxoAgendar;zone.innerHTML='';return}
+  S.reserva={};S.agenda={};
+  const d=fala(`Vamos agendar, ${S.nome}! 💛 Vou abrir a agenda da clínica pra você ver os horários livres…`);
+  carregarAgenda().then(()=>{
+    if(!AG.servicos.length)throw new Error('vazia');
+    fala('Qual atendimento você quer agendar?');
+    opcoes(AG.servicos.map(sv=>({t:`${sv.nome} · ${sv.duracao_min} min`,f:()=>{S.reserva.serv=sv;S.agenda.interesse=sv.nome;escolherDia()}})));
+  }).catch(()=>{fala('Não consegui abrir a agenda online agora 😕 Sem problema: eu anoto sua preferência e a equipe confirma o horário pelo WhatsApp.');setTimeout(()=>{S.agenda={};fluxoAgendarPrefSemNome()},400)});
+}
+function fluxoAgendarPrefSemNome(){const n=S.nome;fluxoAgendarPref();S.nome=n}
+function escolherDia(){
+  const hoje=new Date(agoraFortaleza().data+'T12:00');const dias=[];
+  for(let i=0;i<AGENDA.dias;i++){const d=new Date(hoje);d.setDate(d.getDate()+i);if(AG.horarios[d.getDay()]&&AG.horarios[d.getDay()].aberto)dias.push({k:ymd(d),t:(i===0?'Hoje':i===1?'Amanhã':SEM[d.getDay()])+' '+brData(ymd(d))})}
+  if(!dias.length){fala('A agenda não tem dias abertos nas próximas semanas. Posso deixar seu pedido pra equipe te chamar no WhatsApp?');opcoes([{t:'Sim, pode deixar',go:true,f:()=>{S.agenda={interesse:S.reserva.serv.nome,periodo:'Tanto faz',quando:'O quanto antes'};revisao()}},...MENU().slice(1,3)]);return}
+  fala(`${S.reserva.serv.nome}, ótima escolha! Qual dia fica melhor pra você?`);
+  opcoes(dias.map(x=>({t:x.t,f:()=>{S.reserva.data=x.k;escolherHora()}})));
+}
+async function escolherHora(){
+  const dt=S.reserva.data,sv=S.reserva.serv;const hf=AG.horarios[new Date(dt+'T12:00').getDay()];
+  const msg=fala('Buscando os horários livres…');
+  let ocup;try{ocup=await sbRpc('horarios_ocupados',{p_data:dt})}catch(e){msg.remove();fala('Não consegui buscar os horários agora 😕 Tenta de novo em instantes?');opcoes([{t:'Tentar de novo',go:true,f:escolherHora},{t:'Escolher outro dia',f:escolherDia}]);return}
+  msg.remove();
+  const ini=toMin(hf.inicio),fim=toMin(hf.fim),dur=sv.duracao_min,ag=agoraFortaleza(),ehHoje=dt===ag.data;
+  const busy=(ocup||[]).map(o=>[toMin(o.inicio),toMin(o.fim)]);const livres=[];
+  for(let t=ini;t+dur<=fim;t+=AGENDA.passo){if(ehHoje&&t<ag.min+60)continue;if(!busy.some(([a,b])=>t<b&&t+dur>a))livres.push(toHHMM(t))}
+  if(!livres.length){fala(`Poxa, ${brData(dt)} já está sem vagas pra ${sv.nome.toLowerCase()}. Vamos ver outro dia?`);escolherDia();return}
+  fala(`Horários livres em ${brData(dt)} (${sv.duracao_min} min). Qual você prefere?`);
+  opcoes([...livres.map(h=>({t:h,f:()=>{S.reserva.hora=h;pedirTelefone()}})),{t:'← Outro dia',f:escolherDia}]);
+}
+function pedirTelefone(){
+  if(S.reserva.tel){confirmarReserva();return}
+  fala('Perfeito! Pra finalizar, me passa seu WhatsApp com DDD? É por lá que a clínica confirma tudo com você. 📱');S.esperaTel=true;zone.innerHTML='';setTimeout(()=>$('#q').focus(),100);
+}
+function confirmarReserva(){
+  const r=S.reserva;
+  fala(`Confere pra mim:\n\n📅 ${r.serv.nome}\n🗓 ${SEM[new Date(r.data+'T12:00').getDay()]}, ${brData(r.data)} às ${r.hora} (${r.serv.duracao_min} min)\n👤 ${S.nomeCompleto||S.nome} · ${r.tel}${/avalia/i.test(r.serv.nome)?'\n\nA avaliação é uma consulta personalizada de R$ 100,00, convertidos no procedimento se você decidir fazer.':''}`);
+  opcoes([{t:'Confirmar agendamento',go:true,f:reservar},{t:'Trocar horário',f:escolherHora},{t:'Trocar atendimento',f:fluxoAgendar}]);
+}
+async function reservar(){
+  const r=S.reserva;const msg=fala('Reservando seu horário…');
+  try{await sbRpc('agendar',{p_servico:r.serv.id,p_data:r.data,p_hora:r.hora,p_nome:S.nomeCompleto||S.nome,p_telefone:r.tel,p_obs:'Agendado pela Lis no site'+(S.resp.jaFez?` · já fez procedimento: ${S.resp.jaFez}`:'')})}
+  catch(e){msg.remove();fala(e.negocio?`Ops: ${e.message} 😕`:'Não consegui reservar agora 😕 Vamos tentar outro horário?');escolherHora();return}
+  msg.remove();r.ok=true;
+  fala(`Prontinho, ${S.nome}! 🎉 Seu horário está reservado:\n\n${r.serv.nome} · ${SEM[new Date(r.data+'T12:00').getDay()]}, ${brData(r.data)} às ${r.hora}\n📍 ${CLINICA.endereco} (tem estacionamento no pátio)\n\nSe precisar remarcar, é só chamar a clínica no WhatsApp. Te esperamos! 💛`);
+  const txt=`Olá! Acabei de agendar pelo site com a Lis:\n• ${r.serv.nome}\n• ${brData(r.data)} às ${r.hora}\n• Nome: ${S.nomeCompleto||S.nome}\n• WhatsApp: ${r.tel}`;
+  zone.innerHTML=`<div class="rev"><a class="btn wa" style="width:100%" href="${wa(txt)}" target="_blank" rel="noopener">Avisar a clínica no WhatsApp</a><div class="opts" style="padding:12px 0 0"><button class="opt" id="agMais">Ver outras coisas</button></div></div>`;
+  $('#agMais').onclick=()=>{zone.innerHTML='';opcoes(MENU())};
+}
+/* agendamento da avaliação (plano B: preferência pelo WhatsApp) */
+function fluxoAgendarPref(){
+  if(!S.nome){fala('Vamos agendar sua avaliação! 💛 É rapidinho, só umas perguntinhas.\n\nPra começar, como posso te chamar?');S.esperaNome=true;S.depoisNome=fluxoAgendarPref;zone.innerHTML='';return}
   S.agenda={};
   fala(`Vamos agendar sua avaliação, ${S.nome}! 💛 São só 4 perguntinhas e eu já mando tudo pronto pro WhatsApp da clínica.\n\nO que você gostaria de avaliar?`);
   opcoes([['Botox e linhas de expressão'],['Preenchimentos (lábios, mento, mandíbula, nariz…)'],['Sorriso (lentes, clareamento, diastema)'],['Flacidez e firmeza (bioestimulador, ultrassom)'],['Qualidade da pele (Glass Skin, laser, manchas)'],['Afinar o rosto (papada, bichectomia)'],['Ainda não sei, quero orientação']].map(([t])=>({t,f:()=>{S.agenda.interesse=t;ag2()}})));
@@ -1120,7 +1181,8 @@ let sample=null;
 const KB=()=>JSON.stringify({clinica:CLINICA,produtos:P.map(p=>({id:p.id,nome:p.nome,categoria:p.cat,preco:p.preco,descricao:p.desc,uso:p.uso})),procedimentos:PROCEDIMENTOS.map(p=>({id:p[0],nome:p[1],descricao:p[2],precos:p[5].length?p[5].map(([o,v])=>o+': '+fmtR(v)):'após avaliação'})),combos:COMBOS.map(c=>({id:c[0],nome:c[1],descricao:c[2],preco:fmtR(c[3])})),mentoria:{dias:MENTORIA_DIAS,inscricao:'R$ 200 até 20/12',valor:'R$ 3.000 em até 10x no cartão ou 5% de desconto à vista até o dia da mentoria',condicao:'pagamento integral até 20/12 isenta a inscrição',bonus:'cada aluno ganha ou pode levar um paciente para fazer gratuitamente botox, nariz, boca ou mento',local:'Santé Excellence'}});
 async function perguntar(txt){
   fala(txt,'u');zone.innerHTML='';
-  if(S.esperaNome){S.esperaNome=false;S.nome=txt.trim().split(/\s+/)[0].replace(/[^\p{L}'-]/gu,'');S.nome=S.nome.charAt(0).toUpperCase()+S.nome.slice(1).toLowerCase();store.set({nome:S.nome});if(S.depoisNome){const f=S.depoisNome;S.depoisNome=null;setTimeout(()=>{fala(`Prazer, ${S.nome}! 😊`);setTimeout(f,350)},250);return}setTimeout(()=>{fala(`Prazer, ${S.nome}! 😊 Fico feliz que você esteja se cuidando. Me conta, o que você gostaria de melhorar? Pode tocar numa opção ou escrever do seu jeito.`);opcoes(MENU())},250);return}
+  if(S.esperaTel){const dg=txt.replace(/\D/g,'');if(dg.length<10||dg.length>13){setTimeout(()=>fala('Hmm, esse número parece incompleto. Me manda com DDD, assim: (85) 9 9999-9999 😊'),250);return}S.esperaTel=false;const v=dg.slice(-11);S.reserva.tel=v.length===11?`(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`:`(${v.slice(0,2)}) ${v.slice(2,6)}-${v.slice(6)}`;setTimeout(confirmarReserva,250);return}
+  if(S.esperaNome){S.esperaNome=false;S.nomeCompleto=txt.trim().replace(/\s+/g,' ').slice(0,120);S.nome=txt.trim().split(/\s+/)[0].replace(/[^\p{L}'-]/gu,'');S.nome=S.nome.charAt(0).toUpperCase()+S.nome.slice(1).toLowerCase();store.set({nome:S.nome});if(S.depoisNome){const f=S.depoisNome;S.depoisNome=null;setTimeout(()=>{fala(`Prazer, ${S.nome}! 😊`);setTimeout(f,350)},250);return}setTimeout(()=>{fala(`Prazer, ${S.nome}! 😊 Fico feliz que você esteja se cuidando. Me conta, o que você gostaria de melhorar? Pode tocar numa opção ou escrever do seu jeito.`);opcoes(MENU())},250);return}
   if(sample){const d=fala('digitando…','t');
     try{const hist=[...msgs.querySelectorAll('.m.b,.m.u')].slice(-10).map(m=>(m.classList.contains('u')?'Cliente: ':'Atendente: ')+m.textContent).join('\n');
       const o=await sample.json(`Você é ${ASSISTENTE}, atendente virtual da Santé Excellence. Responda em português do Brasil, curto, simpático e elegante (até 6 linhas). Use SOMENTE os DADOS; nunca invente preços, datas, horários ou informações que não estão neles; se faltar informação, diga que a equipe responde pelo WhatsApp. Use os preços dos procedimentos e combos dos DADOS; procedimento sem preço tem valor após avaliação; diga que os valores são de referência e o plano final é na avaliação. NUNCA ofereça nem confirme dia ou horário: isso é combinado pelo WhatsApp. Sem diagnóstico; indicações gerais. Gestantes e lactantes: orientar a falar com a equipe.\nDADOS: ${KB()}\nCONVERSA:\n${hist}\nResponda à última mensagem da cliente em JSON: {"reply":"texto","show":["ids de produtos a mostrar"],"procedures":["ids de procedimentos de interesse"],"mentoria":false}`,{cache:false,modelTier:'quick'});
