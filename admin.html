@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Painel • Santé Excellence</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f7f3ee;--card:#fffdfa;--ink:#2a2622;--muted:#7a7068;--gold:#b08d57;--line:#e7ddd1;--ok:#3f7d5a;--err:#b5473a}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+  h1,h2{font-family:"Cormorant Garamond",serif}
+  .wrap{max-width:1000px;margin:0 auto;padding:20px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;margin-bottom:16px}
+  .btn{border:0;cursor:pointer;background:var(--ink);color:#fff;padding:9px 16px;border-radius:999px;font:600 13px Inter}
+  .btn.sm{padding:6px 11px;font-size:12px}
+  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .btn.red{background:var(--err)}
+  input,select,textarea{border:1px solid var(--line);border-radius:9px;padding:8px 10px;font:inherit;background:#fff}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  header h1{font-size:28px}
+  .tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+  .tabs button{background:#fff;border:1px solid var(--line);padding:8px 14px;border-radius:999px;cursor:pointer;font:500 13px Inter}
+  .tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .tab{display:none}.tab.on{display:block}
+  table{width:100%;border-collapse:collapse}
+  th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-size:12px;color:var(--muted);font-weight:500;text-transform:uppercase}
+  .tag{font-size:11px;padding:3px 8px;border-radius:999px;background:#eef4ef;color:var(--ok);font-weight:600}
+  .tag.cancelado{background:#f7e8e6;color:var(--err)}
+  .tag.concluido{background:#eee;color:#555}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .muted{color:var(--muted)}
+  .login{max-width:360px;margin:12vh auto}
+  .login input{width:100%;margin-bottom:10px}
+  .stat{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .stat div{background:#fbf5ec;border-radius:12px;padding:10px 14px}
+  .stat b{font-size:20px;display:block}
+  @media(max-width:640px){.hide-m{display:none}}
+</style>
+</head>
+<body>
+
+<div class="login card" id="login">
+  <h2 style="font-size:28px;margin-bottom:4px">Painel da clínica</h2>
+  <p class="muted" style="margin-bottom:14px">Santé Excellence</p>
+  <form id="fl">
+    <input type="email" id="em" placeholder="E-mail" required>
+    <input type="password" id="pw" placeholder="Senha" required>
+    <button class="btn" style="width:100%">Entrar</button>
+    <p id="lmsg" style="color:var(--err);margin-top:10px"></p>
+  </form>
+</div>
+
+<div class="wrap" id="app" style="display:none">
+  <header>
+    <h1>Santé • Agenda</h1>
+    <button class="btn ghost sm" id="sair">Sair</button>
+  </header>
+
+  <div class="tabs">
+    <button class="on" data-t="ag">Agendamentos</button>
+    <button data-t="bl">Bloquear horários</button>
+    <button data-t="sv">Procedimentos</button>
+    <button data-t="hr">Horário de funcionamento</button>
+  </div>
+
+  <!-- AGENDAMENTOS -->
+  <div class="tab on" id="t-ag">
+    <div class="card">
+      <div class="row" style="margin-bottom:14px">
+        <button class="btn ghost sm" id="ant">◀</button>
+        <input type="date" id="dia">
+        <button class="btn ghost sm" id="prox">▶</button>
+        <button class="btn ghost sm" id="hoje">Hoje</button>
+        <label class="row muted" style="margin-left:auto"><input type="checkbox" id="semana"> próximos 7 dias</label>
+      </div>
+      <div class="stat" id="stat"></div>
+      <div style="overflow-x:auto"><table><thead><tr><th>Data/hora</th><th>Cliente</th><th>Procedimento</th><th>Status</th><th></th></tr></thead><tbody id="lista"></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- BLOQUEIOS -->
+  <div class="tab" id="t-bl">
+    <div class="card">
+      <p class="muted" style="margin-bottom:12px">Feche horários que não estarão disponíveis (folga, compromisso, feriado). Eles aparecem como ocupados pro cliente.</p>
+      <form class="row" id="fb">
+        <input type="date" id="bd" required>
+        <input type="time" id="bi" required value="08:00">
+        <input type="time" id="bf" required value="18:00">
+        <input id="bm" placeholder="Motivo (opcional)">
+        <button class="btn sm">Bloquear</button>
+      </form>
+      <table style="margin-top:14px"><thead><tr><th>Data</th><th>Horário</th><th>Motivo</th><th></th></tr></thead><tbody id="lbl"></tbody></table>
+    </div>
+  </div>
+
+  <!-- SERVIÇOS -->
+  <div class="tab" id="t-sv">
+    <div class="card">
+      <table><thead><tr><th>Nome</th><th class="hide-m">Descrição</th><th>Duração (min)</th><th>Ativo</th><th></th></tr></thead><tbody id="lsv"></tbody></table>
+      <button class="btn sm" style="margin-top:12px" id="novoSv">+ Novo procedimento</button>
+    </div>
+  </div>
+
+  <!-- HORÁRIOS -->
+  <div class="tab" id="t-hr">
+    <div class="card">
+      <table><thead><tr><th>Dia</th><th>Aberto</th><th>Abre</th><th>Fecha</th></tr></thead><tbody id="lhr"></tbody></table>
+      <button class="btn sm" style="margin-top:12px" id="salvaHr">Salvar horários</button>
+      <span id="hrMsg" class="muted" style="margin-left:8px"></span>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const sb = createClient("https://mqjjlnpjldptrqmlbefg.supabase.co", "sb_publishable_4rv3YxI9SBYtOvNmZY3knw_ftFZijWV");
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const br = s => s.split("-").reverse().join("/");
+const hm = t => t.slice(0,5);
+const diasN = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+const ymd = d => d.toISOString().slice(0,10);
+const avisar = () => sb.channel("agenda").send({type:"broadcast",event:"mudou",payload:{}});
+let servicos = [];
+
+/* ---- login ---- */
+$("fl").onsubmit = async e => {
+  e.preventDefault();
+  const { error } = await sb.auth.signInWithPassword({ email: $("em").value, password: $("pw").value });
+  if (error) $("lmsg").textContent = "E-mail ou senha incorretos.";
+  else entrar();
+};
+$("sair").onclick = async () => { await sb.auth.signOut(); location.reload(); };
+const { data: { session } } = await sb.auth.getSession();
+if (session) entrar();
+
+async function entrar(){
+  const { data: ok } = await sb.rpc("is_admin");
+  if (!ok){ $("lmsg").textContent = "Esse usuário não tem acesso ao painel."; await sb.auth.signOut(); return; }
+  $("login").style.display = "none"; $("app").style.display = "block";
+  $("dia").value = new Date(Date.now() - 3*3600e3).toISOString().slice(0,10);
+  await carregarServicos(); carregarAg(); carregarBl(); carregarHr();
+  sb.channel("agenda").on("broadcast",{event:"mudou"},()=>carregarAg()).subscribe();
+  setInterval(carregarAg, 30000);
+}
+
+/* ---- abas ---- */
+document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => {
+  document.querySelectorAll(".tabs button").forEach(x => x.classList.toggle("on", x===b));
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.id === "t-"+b.dataset.t));
+});
+
+/* ---- agendamentos ---- */
+const mudaDia = n => { const d = new Date($("dia").value+"T12:00"); d.setDate(d.getDate()+n); $("dia").value = ymd(d); carregarAg(); };
+$("ant").onclick = () => mudaDia(-1); $("prox").onclick = () => mudaDia(1);
+$("hoje").onclick = () => { $("dia").value = new Date(Date.now()-3*3600e3).toISOString().slice(0,10); carregarAg(); };
+$("dia").onchange = carregarAg; $("semana").onchange = carregarAg;
+
+async function carregarAg(){
+  const ini = $("dia").value; let q = sb.from("agendamentos").select("*, servicos(nome)").order("data").order("inicio");
+  if ($("semana").checked){ const f = new Date(ini+"T12:00"); f.setDate(f.getDate()+6); q = q.gte("data", ini).lte("data", ymd(f)); }
+  else q = q.eq("data", ini);
+  const { data, error } = await q;
+  if (error){ $("lista").innerHTML = `<tr><td colspan=5>Erro: ${esc(error.message)}</td></tr>`; return; }
+  const ativos = data.filter(a => a.status !== "cancelado");
+  $("stat").innerHTML = `<div><b>${ativos.length}</b>agendados</div><div><b>${data.filter(a=>a.status==="cancelado").length}</b>cancelados</div>`;
+  $("lista").innerHTML = data.length ? data.map(a => {
+    const wpp = "55" + a.telefone.replace(/\D/g,"");
+    return `<tr>
+      <td><b>${hm(a.inicio)}–${hm(a.fim)}</b><br><span class="muted">${br(a.data)}</span></td>
+      <td>${esc(a.nome)}<br><a class="muted" href="https://wa.me/${wpp}" target="_blank">${esc(a.telefone)}</a>${a.observacao?`<br><i class="muted">${esc(a.observacao)}</i>`:""}</td>
+      <td>${esc(a.servicos?.nome)}</td>
+      <td><span class="tag ${a.status}">${a.status}</span></td>
+      <td><select data-id="${a.id}" class="st">
+        <option value="">mudar…</option><option value="confirmado">confirmado</option><option value="concluido">concluído</option><option value="cancelado">cancelar</option>
+      </select></td></tr>`;
+  }).join("") : `<tr><td colspan=5 class="muted">Nenhum agendamento.</td></tr>`;
+  document.querySelectorAll(".st").forEach(s => s.onchange = async () => {
+    if (!s.value) return;
+    if (s.value === "cancelado" && !confirm("Cancelar esse agendamento? O horário volta a ficar livre.")) { s.value=""; return; }
+    const { error } = await sb.from("agendamentos").update({ status: s.value }).eq("id", s.dataset.id);
+    if (error) alert(error.message.includes("sem_conflito") ? "Esse horário já foi pego por outra pessoa." : error.message);
+    avisar(); carregarAg();
+  });
+}
+
+/* ---- bloqueios ---- */
+$("fb").onsubmit = async e => {
+  e.preventDefault();
+  const { error } = await sb.from("bloqueios").insert({ data:$("bd").value, inicio:$("bi").value, fim:$("bf").value, motivo:$("bm").value || null });
+  if (error) return alert(error.message);
+  $("bm").value = ""; avisar(); carregarBl();
+};
+async function carregarBl(){
+  const { data } = await sb.from("bloqueios").select("*").gte("data", ymd(new Date(Date.now()-3*3600e3))).order("data").order("inicio");
+  $("lbl").innerHTML = data?.length ? data.map(b => `<tr><td>${br(b.data)}</td><td>${hm(b.inicio)}–${hm(b.fim)}</td><td>${esc(b.motivo||"")}</td>
+    <td><button class="btn red sm" data-id="${b.id}">Liberar</button></td></tr>`).join("") : `<tr><td colspan=4 class="muted">Nenhum bloqueio futuro.</td></tr>`;
+  $("lbl").querySelectorAll("button").forEach(b => b.onclick = async () => { await sb.from("bloqueios").delete().eq("id", b.dataset.id); avisar(); carregarBl(); });
+}
+
+/* ---- serviços ---- */
+async function carregarServicos(){
+  const { data } = await sb.from("servicos").select("*").order("ordem");
+  servicos = data || [];
+  $("lsv").innerHTML = servicos.map(s => `<tr data-id="${s.id}">
+    <td><input class="n" value="${esc(s.nome)}" style="width:100%"></td>
+    <td class="hide-m"><input class="d" value="${esc(s.descricao||"")}" style="width:100%"></td>
+    <td><input class="m" type="number" min="10" step="5" value="${s.duracao_min}" style="width:80px"></td>
+    <td><input class="a" type="checkbox" ${s.ativo?"checked":""}></td>
+    <td><button class="btn sm sv">Salvar</button></td></tr>`).join("");
+  $("lsv").querySelectorAll(".sv").forEach(b => b.onclick = async () => {
+    const tr = b.closest("tr");
+    const { error } = await sb.from("servicos").update({
+      nome: tr.querySelector(".n").value, descricao: tr.querySelector(".d").value || null,
+      duracao_min: +tr.querySelector(".m").value, ativo: tr.querySelector(".a").checked
+    }).eq("id", tr.dataset.id);
+    b.textContent = error ? "Erro" : "Salvo ✓"; setTimeout(()=>b.textContent="Salvar", 1500);
+  });
+}
+$("novoSv").onclick = async () => {
+  const nome = prompt("Nome do procedimento:"); if (!nome) return;
+  const dur = +prompt("Duração em minutos:", "60") || 60;
+  const { error } = await sb.from("servicos").insert({ nome, duracao_min: dur, ordem: servicos.length + 1 });
+  if (error) alert(error.message); carregarServicos();
+};
+
+/* ---- horários ---- */
+async function carregarHr(){
+  const { data } = await sb.from("horarios_funcionamento").select("*").order("dia_semana");
+  $("lhr").innerHTML = data.map(h => `<tr data-d="${h.dia_semana}"><td>${diasN[h.dia_semana]}</td>
+    <td><input type="checkbox" class="a" ${h.aberto?"checked":""}></td>
+    <td><input type="time" class="i" value="${hm(h.inicio)}"></td><td><input type="time" class="f" value="${hm(h.fim)}"></td></tr>`).join("");
+}
+$("salvaHr").onclick = async () => {
+  const rows = [...$("lhr").querySelectorAll("tr")].map(tr => ({
+    dia_semana: +tr.dataset.d, aberto: tr.querySelector(".a").checked, inicio: tr.querySelector(".i").value, fim: tr.querySelector(".f").value }));
+  const { error } = await sb.from("horarios_funcionamento").upsert(rows);
+  $("hrMsg").textContent = error ? "Erro: " + error.message : "Salvo ✓"; avisar();
+};
+</script>
+</body>
+</html>
