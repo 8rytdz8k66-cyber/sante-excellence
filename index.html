@@ -983,22 +983,39 @@ function perguntaJaFez(){{
       {fala('Você já fez algum procedimento estético antes?');opcoes([{t:'Sim, já fiz',f:()=>{S.resp.jaFez='Sim';fala('Ótimo! Então você já conhece um pouco do processo. A doutora vai avaliar tudo com carinho. 😊');proximo()}},{t:'Não, seria a primeira vez',f:()=>{S.resp.jaFez='Não, primeira vez';fala('Que bom que você está começando com a gente! Na avaliação a doutora explica tudo com calma, sem pressa, antes de qualquer procedimento. 💛');setTimeout(sugereCuidado,400)}}])}}
 }
 function sugereCuidado(){fala('Pra manter o resultado em casa, um protetor solar diário e uma ampola calmante ajudam muito. Quer ver opções?');opcoes([{t:'Quero ver',go:true,f:()=>sugerir('sensivel','pele sensível')},{t:'Agora não',f:proximo}])}
-/* salva o pedido na planilha do Google (se PLANILHA_URL estiver preenchido) */
-function salvarPedido(){
-  if(!PLANILHA_URL)return;
-  const ag=S.agenda||{};
-  const d={
-    nome:S.nome||'',
-    tipo:ag.interesse?'Agendamento de avaliação':(Object.keys(S.cart).length?'Pedido de produtos':'Dúvida / interesse'),
-    interesse:ag.interesse||'',periodo:ag.periodo||'',quando:ag.quando||'',jaFez:S.resp.jaFez||'',
-    procedimentos:PROCEDIMENTOS.filter(p=>S.procs.has(p[0])).map(p=>`${p[1]} (${precoTxt(p[5])})`).join('; '),
-    combos:COMBOS.filter(c=>S.combos.has(c[0])).map(c=>`${c[1]} (${fmtR(c[3])})`).join('; '),
-    produtos:Object.entries(S.cart).map(([id,q])=>`${q}x ${byId(id).nome}`).join('; '),
-    total:Object.keys(S.cart).length?brl(total()):'',
-    mentoria:!!S.ment,duvida:S.resp.duvida||''
-  };
-  try{fetch(PLANILHA_URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(d)}).catch(()=>{})}catch(e){}
+/* salva tudo o que a cliente pediu pra Lis no painel da clínica (Supabase) */
+function uuid4(){try{if(crypto.randomUUID)return crypto.randomUUID()}catch(e){}return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:(r&3|8)).toString(16)})}
+function conversaTxt(){return [...msgs.querySelectorAll('.m.b,.m.u')].map(m=>(m.classList.contains('u')?'Cliente: ':'Lis: ')+m.textContent.replace(/\s+\n/g,'\n').trim()).filter(x=>!/digitando…$/.test(x)).slice(-60).join('\n').slice(-11000)}
+function dadosPedido(){
+  const ag=S.agenda||{},r=S.reserva||{};
+  const procs=PROCEDIMENTOS.filter(p=>S.procs.has(p[0])).map(p=>`${p[1]} (${precoTxt(p[5])})`);
+  const combos=COMBOS.filter(c=>S.combos.has(c[0])).map(c=>`${c[1]} (${fmtR(c[3])})`);
+  const prods=Object.entries(S.cart).map(([id,q])=>`${q}x ${byId(id).nome} (${brl(byId(id).preco*q)})`);
+  const tipos=[];
+  if(r.ok)tipos.push('Agendou horário');else if(ag.interesse)tipos.push('Quer avaliação');
+  if(prods.length)tipos.push('Produtos');if(procs.length||combos.length)tipos.push('Procedimentos');if(S.ment)tipos.push('Mentoria');
+  return{tipo:tipos.join(' + ')||'Dúvida / conversa',
+    dados:{procedimentos:procs,combos,produtos:prods,total_produtos:prods.length?brl(total()):'',mentoria:!!S.ment,
+      mentoria_atuacao:S.resp.atuacao||'',mentoria_pagamento:S.resp.pagamento||'',
+      avaliacao:ag.interesse?{interesse:ag.interesse,periodo:ag.periodo||'',quando:ag.quando||''}:null,
+      ja_fez_procedimento:S.resp.jaFez||'',duvida:S.resp.duvida||'',
+      reserva:r.ok?{servico:(r.serv&&r.serv.nome)||'',data:r.data||'',hora:r.hora||''}:null}};
 }
+let _ultSalvo='';
+function salvarPedido(enviado){
+  const temUser=msgs.querySelector('.m.u');
+  const {tipo,dados}=dadosPedido();
+  const vazio=!temUser&&!Object.keys(S.cart).length&&!S.procs.size&&!S.combos.size&&!S.ment&&!(S.agenda&&S.agenda.interesse);
+  if(vazio)return;
+  S.pedidoId=S.pedidoId||uuid4();
+  const body={p_id:S.pedidoId,p_nome:S.nomeCompleto||S.nome||'',p_telefone:S.telPedido||(S.reserva&&S.reserva.tel)||'',p_tipo:tipo,
+    p_resumo:mensagem(),p_dados:dados,p_conversa:conversaTxt(),p_enviado:!!enviado};
+  const chave=JSON.stringify([body.p_nome,body.p_telefone,body.p_resumo,body.p_conversa.length,body.p_enviado]);
+  if(chave===_ultSalvo)return;_ultSalvo=chave;
+  try{fetch(`${AGENDA.url}/rest/v1/rpc/registrar_pedido`,{method:'POST',keepalive:true,headers:{apikey:AGENDA.key,'Content-Type':'application/json'},body:JSON.stringify(body)}).catch(()=>{})}catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')salvarPedido(false)});
+addEventListener('pagehide',()=>salvarPedido(false));
 /* ===== agenda online (Supabase): horários livres de verdade ===== */
 const AGENDA={url:'https://mqjjlnpjldptrqmlbefg.supabase.co',key:'sb_publishable_4rv3YxI9SBYtOvNmZY3knw_ftFZijWV',dias:14,passo:30};
 const SEM=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -1054,7 +1071,7 @@ async function reservar(){
   const r=S.reserva;const msg=fala('Reservando seu horário…');
   try{await sbRpc('agendar',{p_servico:r.serv.id,p_data:r.data,p_hora:r.hora,p_nome:S.nomeCompleto||S.nome,p_telefone:r.tel,p_obs:'Agendado pela Lis no site'+(S.resp.jaFez?` · já fez procedimento: ${S.resp.jaFez}`:'')})}
   catch(e){msg.remove();fala(e.negocio?`Ops: ${e.message} 😕`:'Não consegui reservar agora 😕 Vamos tentar outro horário?');escolherHora();return}
-  msg.remove();r.ok=true;
+  msg.remove();r.ok=true;setTimeout(()=>salvarPedido(false),50);
   fala(`Prontinho, ${S.nome}! 🎉 Seu horário está reservado:\n\n${r.serv.nome} · ${SEM[new Date(r.data+'T12:00').getDay()]}, ${brData(r.data)} às ${r.hora}\n📍 ${CLINICA.endereco} (tem estacionamento no pátio)\n\nSe precisar remarcar, é só chamar a clínica no WhatsApp. Te esperamos! 💛`);
   const txt=`Olá! Acabei de agendar pelo site com a Lis:\n• ${r.serv.nome}\n• ${brData(r.data)} às ${r.hora}\n• Nome: ${S.nomeCompleto||S.nome}\n• WhatsApp: ${r.tel}`;
   zone.innerHTML=`<div class="rev"><a class="btn wa" style="width:100%" href="${wa(txt)}" target="_blank" rel="noopener">Avisar a clínica no WhatsApp</a><div class="opts" style="padding:12px 0 0"><button class="opt" id="agMais">Ver outras coisas</button></div></div>`;
@@ -1110,9 +1127,12 @@ function revisao(){
   ${S.ment?`<div class="rl"><span>Mentoria A Chave da HOF</span></div>`:''}
   ${!it.length&&!S.procs.size&&!S.combos.size&&!S.ment&&!(S.agenda&&S.agenda.interesse)?`<p class="note">Você ainda não escolheu nada, mas pode mandar sua dúvida mesmo assim.</p>`:''}
   <p class="note">${S.agenda&&S.agenda.interesse?`📅 Avaliação: ${S.agenda.interesse} · preferência ${S.agenda.periodo.toLowerCase()}, ${S.agenda.quando.toLowerCase()}. A equipe confirma o dia e o horário pelo WhatsApp.`:'Dia e horário: combinados pelo WhatsApp.'}</p>
+  <input id="revTel" type="tel" inputmode="tel" autocomplete="tel" placeholder="Seu WhatsApp com DDD (opcional)" value="${S.telPedido||''}" style="width:100%;margin:10px 0;padding:12px 14px;border:1px solid rgba(0,0,0,.12);border-radius:14px;font:inherit;font-size:16px;background:#fff">
   <a class="btn wa" id="waSend" style="width:100%" href="${wa(mensagem())}" target="_blank" rel="noopener">Enviar no WhatsApp</a>
   <div class="opts" style="padding:12px 0 0"><button class="opt" id="mais">Escolher mais coisas</button></div></div>`;
-  $('#waSend').addEventListener('click',salvarPedido);
+  $('#revTel').addEventListener('input',e=>{S.telPedido=e.target.value.trim().slice(0,30)});
+  $('#waSend').addEventListener('click',()=>salvarPedido(true));
+  salvarPedido(false);
   zone.querySelectorAll('[data-q]').forEach(b=>b.onclick=()=>{const id=b.dataset.q;S.cart[id]=(S.cart[id]||0)+Number(b.dataset.d);if(S.cart[id]<=0)delete S.cart[id];refresh();msgs.lastChild.remove();revisao()});
   $('#mais').onclick=()=>{zone.innerHTML='';opcoes(MENU())};
 }

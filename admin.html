@@ -112,6 +112,23 @@
   .svc .hd input.n{font-weight:600}
   .svc .rw{display:grid;grid-template-columns:1fr 110px;gap:8px;margin-top:8px}
 
+  .pd{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px}
+  .pd.atendido,.pd.arquivado{opacity:.6}
+  .pd .hd{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+  .pd .nm{font-weight:600;font-size:16px}
+  .pd .qd{font-size:12px;color:var(--muted);white-space:nowrap}
+  .pd .tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+  .pd ul{margin:10px 0 0 18px;font-size:14px}
+  .pd li{margin:2px 0}
+  .pd details{margin-top:10px;background:#f7f1ea;border-radius:12px;padding:8px 12px;font-size:13px}
+  .pd summary{font-weight:600;cursor:pointer;color:var(--ink)}
+  .pd pre{white-space:pre-wrap;font:inherit;margin-top:8px;color:#4a423b;max-height:320px;overflow:auto}
+  .pd .acts{grid-template-columns:repeat(3,1fr);margin-top:10px}
+  .tag.wa,.tag.lis{text-transform:none}
+  .tag.novo{background:#fdf0dc;color:#a8660f}
+  .tag.wa{background:#e6f9ee;color:#128c4a}
+  .nav .bdg{position:absolute;top:2px;margin-left:22px;min-width:17px;height:17px;border-radius:9px;background:var(--err);color:#fff;font-size:10px;line-height:17px;padding:0 4px;font-style:normal}
+  .nav button{position:relative}
   /* barra de abas */
   .nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,253,250,.97);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
   .nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:12px;font-size:11px;font-weight:600;color:var(--muted)}
@@ -162,6 +179,14 @@
       <div id="lista"></div>
     </section>
 
+    <!-- PEDIDOS -->
+    <section class="tab" id="t-pd">
+      <h2 class="h2">Pedidos da Lis</h2>
+      <p class="muted" style="font-size:14px;margin:-4px 2px 12px">Tudo o que as clientes pediram ou perguntaram pra Lis no site.</p>
+      <div class="seg" id="pdFiltro" style="margin-bottom:12px"><button class="on" data-f="novo">Novos</button><button data-f="atendido">Atendidos</button><button data-f="todos">Todos</button></div>
+      <div id="lpd"></div>
+    </section>
+
     <!-- BLOQUEIOS -->
     <section class="tab" id="t-bl">
       <h2 class="h2">Bloquear horários</h2>
@@ -200,8 +225,9 @@
 
   <nav class="nav">
     <button class="on" data-t="ag"><i>📅</i>Agenda</button>
+    <button data-t="pd"><i>🛍️</i>Pedidos<em class="bdg" id="pdBdg" style="display:none"></em></button>
     <button data-t="bl"><i>⛔</i>Bloquear</button>
-    <button data-t="sv"><i>✨</i>Procedimentos</button>
+    <button data-t="sv"><i>✨</i>Serviços</button>
     <button data-t="hr"><i>🕘</i>Horários</button>
   </nav>
 </div>
@@ -242,10 +268,10 @@ async function entrar(){
   $("login").style.display = "none"; $("app").style.display = "block";
   $("dia").value = hojeStr();
   await Promise.all([carregarServicos(), carregarHr()]);
-  carregarAg(); carregarBl();
+  carregarAg(); carregarBl(); carregarPd();
   sb.channel("agenda").on("broadcast",{event:"mudou"},()=>carregarAg()).subscribe();
-  setInterval(carregarAg, 30000);
-  document.addEventListener("visibilitychange", () => { if (!document.hidden) carregarAg(); });
+  setInterval(() => { carregarAg(); carregarPd(); }, 30000);
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) { carregarAg(); carregarPd(); } });
 }
 
 /* ---- abas ---- */
@@ -254,7 +280,7 @@ document.querySelectorAll(".nav button").forEach(b => b.onclick = () => {
   document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.id === "t-"+b.dataset.t));
   scrollTo({top:0});
 });
-$("atual").onclick = async () => { $("atual").innerHTML='<span class="spin">↻</span>'; await carregarAg(); await carregarBl(); $("atual").textContent="↻"; toast("Atualizado"); };
+$("atual").onclick = async () => { $("atual").innerHTML='<span class="spin">↻</span>'; await carregarAg(); await carregarBl(); await carregarPd(); $("atual").textContent="↻"; toast("Atualizado"); };
 
 /* ---- faixa de dias ---- */
 async function carregarContagem(){
@@ -274,8 +300,8 @@ function desenharDias(){
   $("days").querySelectorAll(".day").forEach(b => b.onclick = () => { $("dia").value = b.dataset.d; carregarAg(); });
   const on = $("days").querySelector(".day.on"); if (on) on.scrollIntoView({inline:"center",block:"nearest",behavior:"smooth"});
 }
-document.querySelectorAll(".seg button").forEach(b => b.onclick = () => {
-  modo = b.dataset.modo; document.querySelectorAll(".seg button").forEach(x => x.classList.toggle("on", x===b)); carregarAg();
+document.querySelectorAll("#t-ag .seg button").forEach(b => b.onclick = () => {
+  modo = b.dataset.modo; document.querySelectorAll("#t-ag .seg button").forEach(x => x.classList.toggle("on", x===b)); carregarAg();
 });
 $("dia").onchange = () => carregarAg();
 
@@ -324,6 +350,54 @@ async function carregarAg(){
     if (error) toast(error.message.includes("sem_conflito") ? "Esse horário já foi pego" : "Erro ao salvar");
     else toast(s==="cancelado"?"Cancelado":s==="confirmado"?"Confirmado ✓":"Concluído ✓");
     avisar(); carregarAg();
+  });
+}
+
+/* ---- pedidos da Lis ---- */
+let pdFiltro = "novo";
+document.querySelectorAll("#pdFiltro button").forEach(b => b.onclick = () => {
+  pdFiltro = b.dataset.f; document.querySelectorAll("#pdFiltro button").forEach(x => x.classList.toggle("on", x===b)); carregarPd();
+});
+const quando = iso => { const d = new Date(iso), f = new Intl.DateTimeFormat("pt-BR",{timeZone:"America/Fortaleza",day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}).format(d); return f.replace(",", " ·"); };
+async function carregarPd(){
+  const { count } = await sb.from("pedidos").select("id", { count: "exact", head: true }).eq("status","novo");
+  $("pdBdg").style.display = count ? "" : "none"; $("pdBdg").textContent = count > 99 ? "99+" : count;
+  let q = sb.from("pedidos").select("*").order("criado_em", { ascending: false }).limit(100);
+  if (pdFiltro !== "todos") q = q.eq("status", pdFiltro);
+  const { data, error } = await q;
+  if (error){ $("lpd").innerHTML = `<div class="empty">Erro ao carregar: ${esc(error.message)}</div>`; return; }
+  if (!data.length){ $("lpd").innerHTML = `<div class="empty"><b>🛍️</b>${pdFiltro==="novo"?"Nenhum pedido novo.":"Nada por aqui."}</div>`; return; }
+  $("lpd").innerHTML = data.map(p => {
+    const d = p.dados || {}, it = [];
+    (d.produtos||[]).forEach(x => it.push("🧴 " + x));
+    if (d.total_produtos) it.push(`<b>Total dos produtos: ${esc(d.total_produtos)}</b>`);
+    (d.procedimentos||[]).forEach(x => it.push("✨ " + x));
+    (d.combos||[]).forEach(x => it.push("💎 Combo " + x));
+    if (d.reserva) it.push(`📅 Agendou: ${d.reserva.servico} · ${br(d.reserva.data)} às ${d.reserva.hora}`);
+    else if (d.avaliacao) it.push(`📅 Quer avaliação: ${d.avaliacao.interesse} · ${d.avaliacao.periodo} ${d.avaliacao.quando}`.trim());
+    if (d.mentoria) it.push(`🎓 Mentoria A Chave da HOF${d.mentoria_atuacao?` · ${d.mentoria_atuacao}`:""}${d.mentoria_pagamento?` · ${d.mentoria_pagamento}`:""}`);
+    if (d.ja_fez_procedimento) it.push("Já fez procedimento antes: " + d.ja_fez_procedimento);
+    if (d.duvida) it.push("❓ " + d.duvida);
+    const tel = (p.telefone||"").replace(/\D/g,""), wpp = tel.length && tel.length<=11 ? "55"+tel : tel;
+    const primeiro = (p.nome||"").split(" ")[0];
+    const msg = encodeURIComponent(`Olá${primeiro?", "+primeiro:""}! Aqui é da Santé Excellence 💛 Vi seu pedido pelo site com a Lis. Posso te ajudar?`);
+    return `<div class="pd ${p.status}">
+      <div class="hd"><div><div class="nm">${esc(p.nome || "Cliente sem nome")}</div>${p.telefone?`<div class="muted" style="font-size:14px">${esc(p.telefone)}</div>`:""}</div><div class="qd">${quando(p.criado_em)}</div></div>
+      <div class="tags"><span class="tag ${p.status}">${p.status}</span>${p.tipo?`<span class="tag lis">${esc(p.tipo)}</span>`:""}${p.enviado_whatsapp?'<span class="tag wa">mandou no WhatsApp</span>':""}</div>
+      ${it.length?`<ul>${it.map(x => `<li>${x.startsWith("<b>")?x:esc(x)}</li>`).join("")}</ul>`:""}
+      ${p.conversa?`<details><summary>Ver conversa com a Lis</summary><pre>${esc(p.conversa)}</pre></details>`:""}
+      ${p.resumo?`<details><summary>Mensagem do pedido</summary><pre>${esc(p.resumo)}</pre></details>`:""}
+      <div class="acts">
+        ${wpp?`<a class="act wa" href="https://wa.me/${wpp}?text=${msg}" target="_blank" rel="noopener"><i>💬</i>WhatsApp</a>`:`<button class="act" disabled><i>💬</i>Sem número</button>`}
+        ${p.status==="novo"?`<button class="act ok" data-id="${p.id}" data-s="atendido"><i>✓</i>Atendido</button>`:`<button class="act" data-id="${p.id}" data-s="novo"><i>↺</i>Voltar p/ novo</button>`}
+        <button class="act no" data-id="${p.id}" data-s="arquivado" ${p.status==="arquivado"?"disabled":""}><i>🗂</i>Arquivar</button>
+      </div></div>`;
+  }).join("");
+  $("lpd").querySelectorAll("button.act[data-id]").forEach(b => b.onclick = async () => {
+    b.disabled = true;
+    const { error } = await sb.from("pedidos").update({ status: b.dataset.s }).eq("id", b.dataset.id);
+    toast(error ? "Erro ao salvar" : b.dataset.s==="atendido" ? "Marcado como atendido ✓" : b.dataset.s==="arquivado" ? "Arquivado" : "Voltou pra novos");
+    carregarPd();
   });
 }
 
