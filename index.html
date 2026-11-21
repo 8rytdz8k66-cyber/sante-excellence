@@ -332,7 +332,7 @@
           <button data-agendar class="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-4 font-semibold text-choc transition hover:-translate-y-0.5 hover:shadow-lg">
             <svg class="ico h-5 w-5" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>Quero agendar minha avaliação
           </button>
-          <p class="mt-4 text-center text-xs text-[#E6D9C8]">Avaliação personalizada: R$ 100, convertidos no procedimento se você decidir fazer. A equipe confirma o dia e o horário pelo WhatsApp.</p>
+          <p class="mt-4 text-center text-xs text-[#E6D9C8]">Avaliação personalizada: R$ 100, que não são cobrados se você fizer algum procedimento. A equipe confirma o dia e o horário pelo WhatsApp.</p>
         </div>
       </div>
     </section>
@@ -436,77 +436,81 @@ seringa:'data:image/webp;base64,UklGRnJZAQBXRUJQVlA4IGZZAQAQdQadASpWAwAFPjEYikQi
 // preços vazios = "Valor após avaliação"
 const PROC_CATS = [
  ['Preenchimentos e volumizadores','procedimento','Com ácido hialurônico, para volume, contorno e equilíbrio do rosto.',[
-  ['labial','Preenchimento labial','Aumenta o volume, define o contorno e corrige assimetrias dos lábios.','labial|labio|boca|beico',[['Preenchimento labial',900]]],
-  ['rino','Rinomodelação','Modela o nariz sem cirurgia: disfarça a giba ("ossinho") ou empina a ponta.','rino|nariz|giba|ossinho',[['Rinomodelação',900]]],
-  ['mento','Preenchimento de mento (queixo)','Aumenta, projeta ou corrige a forma do queixo para equilibrar o perfil.','mento|queixo',[['Mento',900],['Mento (2 ml)',1500]]],
-  ['perfil','Perfilplastia','Harmoniza o perfil equilibrando nariz, lábios e queixo.','perfilplastia|perfil',[['Perfilplastia',2500]]],
-  ['mandibula','Preenchimento de mandíbula','Define o contorno entre o rosto e o pescoço, deixando o maxilar mais desenhado.','mandibula|maxilar|contorno do rosto',[['Mandíbula (2 ml)',1500],['Mandíbula (4 ml)',2400],['Mandíbula (6 ml)',3000]]],
-  ['malar','Preenchimento malar','Dá volume e projeção às maçãs do rosto, com efeito de sustentação.','malar|macas do rosto|maca do rosto|bochecha',[['Malar (2 ml)',1500],['Malar (4 ml) com bigode chinês',2400]]],
-  ['sulco','Preenchimento de sulco nasogeniano','Suaviza o "bigode chinês", a linha que vai da lateral do nariz ao canto da boca.','bigode chines|nasogeniano|sulco',[['Malar (4 ml) com bigode chinês',2400]]],
-  ['olheiras','Preenchimento de olheiras','Preenche a cavidade abaixo dos olhos e tira o aspecto de olhar cansado.','olheira|olhar cansado|olho fundo',[]],
-  ['marionete','Preenchimento de linhas de marionete','Corrige os vincos que descem dos cantos da boca até o queixo, que dão aspecto de tristeza.','marionete|canto da boca|tristeza',[]],
+  ['labial','Preenchimento labial','Natural lips: pode usar mais de 1 ml, preservando um resultado natural e harmônico. Lábios volumosos: 2 ml ou mais, pra lábios mais cheios mantendo o contorno e o equilíbrio.','labial|labio|boca|beico|natural lips|volumoso',[['Natural lips',900],['Lábios volumosos',1500]]],
+  ['rino','Rinomodelação','Com ácido hialurônico, mediante avaliação: regulariza o dorso ou empina a pontinha do nariz, pra harmonia do perfil.','rino|nariz|giba|ossinho|dorso|pontinha',[['Rinomodelação',1000]]],
+  ['mento','Preenchimento de mento (queixo)','2 ml ou mais pra projetar o queixo: na horizontal harmoniza o perfil, na vertical alonga o rosto.','mento|queixo',[['Preenchimento de mento',1500]]],
+  ['mandibula','Preenchimento de mandíbula','Trabalha todo o contorno facial, com projeção e marcação. Podem ser usados mais de 5 ml pro resultado ideal.','mandibula|maxilar|contorno do rosto|contorno facial',[['Preenchimento de mandíbula',3000]]],
+  ['malar','Preenchimento malar','Preenche a região de sustentação das maçãs do rosto, em média 2 ml.','malar|macas do rosto|maca do rosto|bochecha',[['Preenchimento malar',1500]]],
+  ['sulco','Preenchimento de bigode chinês','Suaviza superficialmente o "bigode chinês", a linha que vai da lateral do nariz ao canto da boca.','bigode chines|nasogeniano|sulco',[['Bigode chinês',900]]],
+  ['olheiras','Preenchimento de olheiras','Suaviza a profundidade da região abaixo dos olhos e tira o aspecto de olhar cansado.','olheira|olhar cansado|olho fundo',[['Olheiras',1000]]],
+  ['marionete','Preenchimento de marionete','Suaviza a marcação dos ângulos da boca, que dá aspecto de tristeza.','marionete|canto da boca|tristeza|angulo da boca',[['Marionete',1200]]],
   ['temporas','Preenchimento de têmporas','Repõe o volume na lateral da testa e ajuda a levantar a cauda da sobrancelha.','tempora|lateral da testa|sobrancelha caida',[]],
-  ['mdcodes','MD Codes','Técnica de mapeamento que aplica ácido hialurônico em pontos estratégicos para levantar o rosto (efeito lifting).','md codes|mdcodes|medical codes|levantar o rosto|lifting',[]],
+  ['mdcodes','MD Codes','Técnica de mapeamento que aplica ácido hialurônico em pontos estratégicos pra levantar o rosto (efeito lifting).','md codes|mdcodes|medical codes|levantar o rosto',[]],
  ]],
- ['Relaxamento muscular','marcacao','Toxina botulínica para suavizar e prevenir linhas de expressão.',[
-  ['botox','Toxina botulínica (Botox, Dysport, Xeomin)','Suaviza e previne rugas na testa, entre as sobrancelhas e ao redor dos olhos (pés de galinha).','botox|toxina|dysport|xeomin|testa|pe de galinha|pes de galinha|ruga|linha de expressao|linhas de expressao',[['Botox preventivo',580],['Botox convencional',800],['Botox full face',1100]]],
-  ['masseter','Botox no masseter','No músculo da mastigação, para afinar o rosto quadrado ou aliviar o bruxismo.','masseter|bruxismo|rosto quadrado|ranger',[]],
-  ['nefertiti','Botox Nefertiti','No pescoço e na linha da mandíbula, para melhorar o contorno do rosto.','nefertiti|pescoco',[]],
-  ['gengival','Sorriso gengival','Diminui a exposição da gengiva ao sorrir.','gengival|gengiva|sorriso',[]],
+ ['Relaxamento muscular','marcacao','Toxina botulínica personalizada pra força muscular de cada paciente.',[
+  ['botox','Toxina botulínica (Botox)','Protocolo personalizado de acordo com a necessidade e a força muscular de cada paciente, com aplicação em todas as regiões necessárias.','botox|toxina|dysport|xeomin|testa|pe de galinha|pes de galinha|ruga|linha de expressao|linhas de expressao|preventivo|funcional',[['Botox preventivo',650],['Botox convencional',900],['Botox funcional',1200]]],
+  ['masseter','Botox no masseter','No músculo da mastigação, pra afinar o rosto quadrado ou aliviar o bruxismo.','masseter|bruxismo|rosto quadrado|ranger',[]],
+  ['nefertiti','Botox Nefertiti','No pescoço e na linha da mandíbula, pra melhorar o contorno do rosto.','nefertiti|pescoco',[]],
+  ['gengival','Sorriso gengival','Diminui a exposição da gengiva ao sorrir.','gengival|gengiva',[]],
  ]],
- ['Colágeno e firmeza','seringa','Para flacidez e sustentação, estimulando o colágeno da própria pele.',[
-  ['bioestimulador','Bioestimuladores de colágeno','Sculptra, Eleva e Diamond: estimulam o corpo a produzir colágeno novo e combatem a flacidez.','bioestimulador|sculptra|radiesse|eleva|elleva|diamond|colageno|flacidez',[['Sculptra (rosto)',1500],['Eleva (rosto)',1300],['Eleva (rosto + pescoço)',2000],['Diamond (1,25 ml)',900],['Diamond (2,5 ml)',1500]]],
-  ['ultrassom','Ultrassom microfocado','Ultraformer ou Liftera: firmeza e efeito lifting sem agulhas.','ultrassom|ultraformer|liftera|sem agulha',[['Ultrassom (rosto)',800],['Ultrassom (papada)',600],['Ultrassom (rosto e pescoço)',1500]]],
-  ['fios','Fios de sustentação (PDO)','Fios absorvíveis que levantam tecidos caídos e estimulam colágeno.','fios|fio de pdo|pdo|sustentacao',[]],
+ ['Colágeno e firmeza','seringa','Pra flacidez e sustentação, estimulando o colágeno da própria pele.',[
+  ['bioestimulador','Bioestimulador de colágeno','Trabalha a densidade da pele, tratando a flacidez. Usamos Sculptra, Eleva, Radiesse e Diamond, com indicação personalizada.','bioestimulador|sculptra|radiesse|eleva|elleva|diamond|colageno|flacidez|densidade',[['Bioestimulador de colágeno',1500]]],
+  ['ultrassom','Ultrassom microfocado','Tecnologia pra flacidez, redução de volume e melhora da qualidade da pele.','ultrassom|ultraformer|liftera|sem agulha|microfocado',[['Ultrassom (rosto)',400],['Ultrassom (papada e pescoço)',400],['Ultrassom (rosto e pescoço)',600]]],
+  ['fios','Fios de sustentação (PDO)','Fios absorvíveis que levantam tecidos caídos e estimulam colágeno.','fios|fio de pdo|pdo|pontos de sustentacao',[]],
  ]],
- ['Redução de gordura e afinamento','ombro','Para afinar o rosto e o contorno.',[
+ ['Redução de gordura e afinamento','ombro','Pra afinar o rosto e o contorno.',[
   ['papada','Lipo de papada enzimática','Injeções que quebram a gordura abaixo do queixo e reduzem o "queixo duplo".','papada|queixo duplo|lipo enzimatica',[]],
-  ['emptiers','Esvaziadores de gordura (Emptiers)','Enzimas em pequenas bolsas de gordura do rosto para afinar e dar leveza.','emptier|esvaziador|bolsa de gordura|bolsinha',[]],
-  ['bichectomia','Bichectomia','Pequena cirurgia por dentro da boca que remove parte da gordura das bochechas para afinar o rosto.','bichectomia|bichat|afinar o rosto|afinar rosto',[]],
+  ['emptiers','Esvaziadores de gordura (Emptiers)','Enzimas em pequenas bolsas de gordura do rosto pra afinar e dar leveza.','emptier|esvaziador|bolsa de gordura|bolsinha',[]],
+  ['bichectomia','Bichectomia','Pequena cirurgia por dentro da boca que remove parte da gordura das bochechas pra afinar o rosto.','bichectomia|bichat|afinar o rosto|afinar rosto',[]],
  ]],
  ['Qualidade e hidratação da pele','logo','Viço, textura, manchas e hidratação profunda.',[
-  ['glassskin','Protocolo Glass Skin (peeling coreano)','Pele de porcelana, com viço e luminosidade: renova a pele de forma progressiva, melhora textura, uniformiza o tom, reduz manchas, estimula colágeno e ajuda no controle da oleosidade e da acne.','glass skin|glassskin|peeling coreano|pele de porcelana|glow',[]],
-  ['microagulhamento','Microagulhamento','Microagulhas que estimulam colágeno e ajudam a entrada de vitaminas e clareadores. Com subcisão, também trata cicatrizes.','microagulhamento|drug delivery|ipca|cicatriz|subcisao',[['Microagulhamento',200],['Microagulhamento com subcisão',250]]],
-  ['laser','Laser de CO2','Renovação da pele para textura, manchas e uniformidade.','laser|co2',[['Laser de CO2',800]]],
+  ['glassskin','Peeling coreano (Glass Skin)','Renovação superficial da pele: melhora a uniformidade do tom, a textura e a luminosidade, com aparência mais saudável e revitalizada.','glass skin|glassskin|peeling coreano|pele de porcelana|glow',[['Peeling coreano',150]]],
+  ['pdrn','Indução percutânea com PDRN','Estimula colágeno, favorece a regeneração celular, melhora textura e qualidade da pele, suaviza linhas finas, hidrata e devolve luminosidade e viço.','pdrn|inducao percutanea|polinucleotideo|esperma de salmao|salmao',[['Indução com PDRN',250]]],
+  ['laser','Laser de CO2','Queimadura controlada que estimula a regeneração da pele, reduzindo linhas, manchas e cicatrizes. Feito em datas específicas, quando a clínica está com a máquina.','laser|co2',[['Laser CO2 Glow',600],['Laser CO2 rejuvenescimento',800],['Laser CO2 clareamento ou cicatrizes',800]]],
+  ['microagulhamento','Microagulhamento','Microagulhas que estimulam colágeno e ajudam a entrada de ativos. Com subcisão, também trata cicatrizes.','microagulhamento|drug delivery|ipca|cicatriz|subcisao',[]],
   ['skinbooster','Skinbooster','Ácido hialurônico bem fino que hidrata a pele por dentro, com brilho e maciez, sem dar volume.','skinbooster|skin booster|vico|hidratacao profunda',[]],
   ['peeling','Peeling químico','Ácidos que renovam a pele e melhoram manchas, poros dilatados e textura.','peeling quimico|acido na pele|renovar a pele',[]],
  ]],
  ['Odontologia estética','consultorio','Sorriso mais bonito e harmônico, com planejamento personalizado.',[
-  ['lentes','Lentes em resina','Facetas em resina que corrigem cor, forma e pequenas imperfeições dos dentes.','lente|lentes|faceta|facetas|resina',[]],
-  ['recontorno','Recontorno dental','Ajuste fino no formato dos dentes para um sorriso mais harmônico.','recontorno|formato dos dentes|dente torto',[]],
+  ['avalodonto','Avaliação odontológica','Personalização da estética do sorriso com planejamento individualizado.','avaliacao odontologica|dentista|consulta odontologica',[['Avaliação odontológica',100]]],
+  ['limpeza','Limpeza completa','Além da escovinha: raspagem de tártaro, jato de bicarbonato, instrução de higiene oral e polimento de resinas.','limpeza|tartaro|raspagem|bicarbonato|profilaxia',[['Limpeza completa',250]]],
+  ['facetas','Manutenção e reparo de facetas','Limpeza completa, polimento e reparo de lentes parcialmente fraturadas. Reparo pra trinca de até metade do dente.','manutencao de faceta|manutencao de lente|reparo|lente quebrada|lente trincada|faceta quebrada',[['Reparo de facetas',150],['Manutenção de facetas',350],['Manutenção de lentes feitas por outro profissional',450]]],
+  ['recontorno','Recontorno dental (6 dentes)','Harmoniza o sorriso com acréscimos estratégicos em resina, preservando a naturalidade.','recontorno|formato dos dentes|dente torto',[['Recontorno 6 dentes',1500]]],
+  ['lentes','Lentes estratificadas em resina (10 dentes)','Facetas com naturalidade que entregam harmonia completa pra um sorriso transformado.','lente|lentes|faceta|facetas|resina',[['Lentes em resina 10 dentes',3000]]],
   ['diastema','Fechamento de diastema','Fecha os espaços entre os dentes, sem aparelho.','diastema|espaco entre os dentes|dente separado|dentes separados',[]],
-  ['clarcaseiro','Clareamento caseiro','Clareamento feito em casa com moldeira personalizada, com acompanhamento.','clareamento caseiro|moldeira',[]],
-  ['clarconsultorio','Clareamento de consultório','Clareamento feito na clínica, com resultado mais rápido.','clareamento de consultorio|clareamento|clarear os dentes|clarear dente|dentes amarelos|dente amarelo',[]],
+  ['clarcaseiro','Clareamento caseiro','Inclui limpeza e o kit completo pro clareamento em casa.','clareamento caseiro|moldeira|kit de clareamento',[['Clareamento caseiro',700]]],
+  ['clarconsultorio','Clareamento de consultório','1 sessão de clareamento feita pelo profissional no consultório.','clareamento de consultorio|clareamento|clarear os dentes|clarear dente|dentes amarelos|dente amarelo',[['Clareamento de consultório',300]]],
  ]],
 ];
 const PROCEDIMENTOS = PROC_CATS.flatMap(([c,,,l])=>l.map(p=>[p[0],p[1],p[2],p[3],c,p[4]||[]]));
-// combos: [id, nome, descrição, preço]
+// protocolos (combos): [id, nome, descrição, preço]
 const COMBOS = [
- ['c-botoxboca','Botox e boca','Expressão mais leve e lábios mais harmoniosos.',1500],
- ['c-botoxlaser','Botox e laser','Expressão mais leve e uma pele mais uniforme.',1100],
- ['c-ultrabio','Ultrassom microfocado + bioestimulador (rosto)','Firmeza e estímulo de colágeno no rosto.',2500],
- ['c-ultrabiop','Ultrassom microfocado + bioestimulador (rosto e pescoço)','Firmeza e estímulo de colágeno no rosto e pescoço.',3500],
- ['c-firming','Protocolo Firming Lift','3 ml de ácido hialurônico + 1,25 ml de Diamond.',2500],
+ ['c-botoxboca','Botox + boca','Protocolo queridinho: expressão leve e lábios harmoniosos.',1600],
+ ['c-perfil','Perfilplastia (nariz + boca + mento)','Protocolo harmonia: equilibra nariz, lábios e queixo.',2700],
+ ['c-rugas','Botox + PDRN + peeling coreano','Protocolo rugas e linhas de expressão.',1000],
+ ['c-pele','Botox + laser de CO2 + peeling coreano','Protocolo pele dos sonhos.',1500],
+ ['c-ultrabio','Ultrassom + bioestimulador de colágeno','Protocolo pra flacidez.',2200],
+ ['c-lifting','Ultrassom + bioestimulador + pontos de sustentação','Protocolo lifting facial.',3200],
 ];
 const OBJETIVOS = [
- ['Rugas e linhas de expressão',['botox','skinbooster','mdcodes']],
+ ['Rugas e linhas de expressão',['botox','pdrn','skinbooster','mdcodes']],
  ['Flacidez e firmeza',['bioestimulador','ultrassom','fios','mdcodes']],
- ['Contorno e perfil',['perfil','mandibula','mento','rino','malar']],
+ ['Contorno e perfil',['mandibula','mento','rino','malar']],
  ['Lábios e sorriso',['labial','gengival']],
  ['Olhar cansado',['olheiras','temporas','botox']],
  ['Afinar o rosto',['papada','masseter','emptiers','bichectomia']],
- ['Manchas, poros e textura',['glassskin','laser','microagulhamento','peeling']],
- ['Sorriso e dentes',['lentes','clarconsultorio','clarcaseiro','diastema','recontorno','gengival']],
+ ['Manchas, poros e textura',['glassskin','pdrn','laser','microagulhamento','peeling']],
+ ['Sorriso e dentes',['avalodonto','limpeza','lentes','recontorno','clarconsultorio','clarcaseiro','facetas','diastema']],
 ];
 const fmtR = v => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-const precoTxt = precos => !precos.length ? 'Valor na avaliação' : 'a partir de ' + fmtR(Math.min(...precos.map(x => x[1])));
-const NOTA_PRECO = 'Os valores são "a partir de" e podem variar de acordo com a personalização do protocolo, definida na avaliação.';
+const precoTxt = precos => !precos.length ? 'Valor na avaliação' : precos.length===1 ? fmtR(precos[0][1]) : 'a partir de ' + fmtR(Math.min(...precos.map(x => x[1])));
+const NOTA_PRECO = 'Os valores podem variar de acordo com a personalização do protocolo, definida na avaliação.';
 
 
   // Os 4 cards da seção de tratamentos (cada um abre a lista de procedimentos da categoria)
   const SERVICOS = [
     { cat: 'Preenchimentos e volumizadores', titulo: 'Preenchimentos', texto: 'Lábios, malar, mandíbula, mento, olheiras, bigode chinês, rinomodelação e MD Codes, com ácido hialurônico.', icone: '<path d="M12 3c-3.3 0-6 2.9-6 6.5 0 4.6 3.6 6.8 4.4 11.5h3.2c.8-4.7 4.4-6.9 4.4-11.5C18 5.9 15.3 3 12 3z"/>' },
-    { cat: 'Relaxamento muscular', titulo: 'Toxina botulínica', texto: 'Botox preventivo, convencional e full face (a partir de R$ 580), masseter, sorriso gengival e Nefertiti.', icone: '<circle cx="12" cy="12" r="8.5"/><path d="M8.5 10h.01M15.5 10h.01M8.5 15c2 1.5 5 1.5 7 0"/>' },
+    { cat: 'Relaxamento muscular', titulo: 'Toxina botulínica', texto: 'Botox preventivo (R$ 650), convencional (R$ 900) e funcional (R$ 1.200), masseter, sorriso gengival e Nefertiti.', icone: '<circle cx="12" cy="12" r="8.5"/><path d="M8.5 10h.01M15.5 10h.01M8.5 15c2 1.5 5 1.5 7 0"/>' },
     { cat: 'Colágeno e firmeza', titulo: 'Colágeno e firmeza', texto: 'Bioestimuladores Sculptra, Eleva e Diamond, ultrassom microfocado e fios de PDO para flacidez.', icone: '<path d="M12 21V11M12 11c0-4 3-7 7-7 0 4-3 7-7 7zM12 14c0-3-2.5-5.5-6-5.5 0 3.5 2.5 5.5 6 5.5z"/>' },
     { cat: 'Qualidade e hidratação da pele', titulo: 'Pele e contorno', texto: 'Glass Skin (peeling coreano), laser de CO2, microagulhamento, skinbooster, papada e bichectomia.', icone: '<path d="M12 3l2.2 5.4 5.8.6-4.4 3.9 1.3 5.7L12 15.6 7.1 18.6l1.3-5.7L4 9l5.8-.6z"/>', extra: 'Redução de gordura e afinamento' },
   ];
@@ -514,8 +518,8 @@ const NOTA_PRECO = 'Os valores são "a partir de" e podem variar de acordo com a
   SERVICOS.push({ cat: 'Odontologia estética', titulo: 'Odontologia estética', texto: 'Lentes em resina, recontorno dental, fechamento de diastema e clareamento caseiro ou de consultório.', icone: '<path d="M7 4c-2 0-3.5 1.6-3.5 4 0 3 1.5 4 2 7 .4 2.4 1 5 2.3 5 1.6 0 1.4-4.5 3.2-4.5S12.6 20 14.2 20c1.3 0 1.9-2.6 2.3-5 .5-3 2-4 2-7 0-2.4-1.5-4-3.5-4-1.8 0-2.5 1-3 1S8.8 4 7 4z"/>' });
   const FAQ = [
     ['Como faço para agendar?', 'Toque em "Agendar avaliação": a Lis, nossa atendente virtual, faz seu pré-agendamento em poucas perguntas e envia tudo pro WhatsApp. A equipe confirma o dia e o horário com você.'],
-    ['Quanto custa a avaliação?', 'A avaliação é uma consulta personalizada e custa R$ 100,00. Se você decidir fazer o procedimento, esse valor é convertido no tratamento.'],
-    ['Quanto custam os procedimentos?', 'Os valores de cada procedimento aparecem em "Saiba mais" nos tratamentos: botox a partir de R$ 580, preenchimento labial R$ 900, bioestimulador a partir de R$ 900, e combos a partir de R$ 1.100. Os valores são "a partir de" e podem variar de acordo com a personalização do protocolo.'],
+    ['Quanto custa a avaliação?', 'A avaliação (planejamento facial em harmonização) custa R$ 100,00 e dura cerca de 30 min: você avalia junto com a especialista todos os procedimentos pra prevenir e corrigir suas queixas. E o diferencial: esse valor não é cobrado se você fizer algum procedimento.'],
+    ['Quanto custam os procedimentos?', 'Os valores de cada procedimento aparecem em "Saiba mais" nos tratamentos: botox a partir de R$ 650, preenchimento labial a partir de R$ 900, bioestimulador R$ 1.500, peeling coreano R$ 150 e protocolos a partir de R$ 1.000. Os valores podem variar de acordo com a personalização do protocolo.'],
     ['Nunca fiz nenhum procedimento. Por onde começo?', 'Pela avaliação. A doutora entende o que você quer, explica as opções, o que esperar e os cuidados, antes de qualquer procedimento.'],
     ['Vocês vendem e entregam skincare?', 'Sim. Nossos produtos são originais e importados. Entregamos em Fortaleza e região por R$ 15,00 (a combinar) ou você retira grátis na clínica. Pagamento em dinheiro, Pix ou cartão em até 10x.'],
     ['Quem pode fazer a Mentoria A Chave da HOF?', 'Profissionais da saúde que atuam na harmonização facial (odontologia, biomedicina, farmácia, enfermagem, fisioterapia e outras áreas). São 2 módulos (sexta das 9h às 19h e sábado das 9h às 13h, em 15–16/01 e 29–30/01), só 4 vagas por turma, com certificado, materiais inclusos e pacientes modelo fornecidos pela clínica. Inscrição R$ 200 até 20/12 e mentoria de R$ 3.000 em até 10x no cartão ou 5% de desconto à vista.'],
@@ -551,7 +555,7 @@ const NOTA_PRECO = 'Os valores são "a partir de" e podem variar de acordo com a
     <article class="reveal flex flex-col rounded-3xl bg-choc p-6 text-gelo transition duration-300 hover:-translate-y-1 hover:shadow-xl">
       <span class="flex h-12 w-12 items-center justify-center rounded-2xl bg-gold text-choc"><svg class="ico" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg></span>
       <h3 class="mt-5 font-serif text-2xl">Avaliação personalizada</h3>
-      <p class="mt-2 flex-1 text-[15px] leading-relaxed text-[#E6D9C8]">Consulta com a Dra. Angélica para montar o seu plano. <b class="text-gold">R$ 100,00</b>, convertidos no procedimento se você decidir fazer.</p>
+      <p class="mt-2 flex-1 text-[15px] leading-relaxed text-[#E6D9C8]">Consulta com a Dra. Angélica para montar o seu plano. <b class="text-gold">R$ 100,00</b>, que não são cobrados se você fizer algum procedimento.</p>
       <button data-agendar class="mt-5 inline-flex items-center gap-2 self-start font-semibold text-gold transition hover:gap-3">Agendar com a Lis <span aria-hidden="true">→</span></button>
     </article>`;
 
@@ -598,7 +602,7 @@ const NOTA_PRECO = 'Os valores são "a partir de" e podem variar de acordo com a
   modal.addEventListener('click', e => { if (e.target === modal) fecharModal(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.classList.contains('hidden')) fecharModal(); });
 
-  const lista = itens => `<ul class="divide-y divide-linha border-y border-linha">${itens.map(([, n, d, , pr]) => `<li class="flex items-start justify-between gap-4 py-4"><div><p class="font-semibold">${n}</p><p class="mt-1 text-sm text-suave">${d}</p><p class="mt-2 flex flex-wrap gap-1.5">${(pr && pr.length ? pr : [['Valor após avaliação', null]]).map(([o, v]) => `<span class="rounded-full bg-creme px-2.5 py-1 text-xs text-suave">${o}${v ? ` <b class="font-semibold text-choc">${fmtR(v)}</b>` : ''}</span>`).join('')}</p></div><a href="${wa(`Olá! Gostaria de saber sobre ${n} na Santé Excellence.`)}" target="_blank" rel="noopener" class="shrink-0 rounded-full border border-choc px-4 py-2 text-sm font-semibold transition hover:bg-choc hover:text-gelo">Perguntar</a></li>`).join('')}</ul><p class="mt-4 text-sm text-suave">${NOTA_PRECO} Avaliação personalizada: R$ 100,00, convertidos no procedimento. Dia e horário combinados pelo WhatsApp.</p>`;
+  const lista = itens => `<ul class="divide-y divide-linha border-y border-linha">${itens.map(([, n, d, , pr]) => `<li class="flex items-start justify-between gap-4 py-4"><div><p class="font-semibold">${n}</p><p class="mt-1 text-sm text-suave">${d}</p><p class="mt-2 flex flex-wrap gap-1.5">${(pr && pr.length ? pr : [['Valor após avaliação', null]]).map(([o, v]) => `<span class="rounded-full bg-creme px-2.5 py-1 text-xs text-suave">${o}${v ? ` <b class="font-semibold text-choc">${fmtR(v)}</b>` : ''}</span>`).join('')}</p></div><a href="${wa(`Olá! Gostaria de saber sobre ${n} na Santé Excellence.`)}" target="_blank" rel="noopener" class="shrink-0 rounded-full border border-choc px-4 py-2 text-sm font-semibold transition hover:bg-choc hover:text-gelo">Perguntar</a></li>`).join('')}</ul><p class="mt-4 text-sm text-suave">${NOTA_PRECO} Avaliação personalizada: R$ 100,00, não cobrados se você fizer algum procedimento. Dia e horário combinados pelo WhatsApp.</p>`;
 
   document.addEventListener('click', e => {
     const sv = e.target.closest('[data-servico]');
@@ -660,13 +664,13 @@ const CLINICA = {
   whatsappTexto: '(85) 9 9203-2525',
   mapa: 'https://maps.app.goo.gl/QcMD2RY3eRRaG12t6',
   horario: 'Somente com agendamento. Segunda e quarta: 9h às 12h e 15h30 às 19h30. Terça, quinta e sexta: 9h às 13h e 14h às 18h',          // ex.: 'Seg a sex, 9h às 18h · Sáb, 9h às 13h'
-  avaliacao: 'A avaliação é uma consulta personalizada e custa R$ 100,00. Se você decidir fazer o procedimento, esse valor é convertido no tratamento.',        // ex.: 'A avaliação é gratuita.'
+  avaliacao: 'A avaliação (planejamento facial em harmonização) custa R$ 100,00 e dura cerca de 30 min: você avalia junto com a especialista todos os procedimentos pra prevenir e corrigir suas queixas. E o diferencial: esse valor não é cobrado se você fizer algum procedimento.',        // ex.: 'A avaliação é gratuita.'
   pagamento: 'Aceitamos dinheiro, Pix e cartão em até 10x.',
   entrega: 'Entregamos em domicílio em Fortaleza e região por R$ 15,00 (a combinar), ou você retira grátis na clínica no horário de funcionamento.',
   estacionamento: 'Temos estacionamento dentro do pátio comercial onde a clínica fica.',
   produtos: 'Nossos produtos de skincare são originais e importados.',
   sobreDoutora: null,     // ex.: 'Cirurgiã-dentista, especialista em HOF há X anos.'
-  odontologia: 'Na odontologia estética fazemos lentes em resina, recontorno dental, fechamento de diastema, clareamento caseiro e clareamento de consultório. Os valores são passados na avaliação, de acordo com o seu caso.',      // ex.: 'Fazemos clareamento, lentes, limpeza e ortodontia.'
+  odontologia: 'Na odontologia estética: avaliação odontológica R$ 100, limpeza completa R$ 250, reparo de facetas R$ 150, manutenção de facetas R$ 350 (R$ 450 se as lentes foram feitas por outro profissional), recontorno de 6 dentes R$ 1.500, lentes estratificadas em resina (10 dentes) R$ 3.000, clareamento caseiro R$ 700 (com limpeza e kit) e clareamento de consultório R$ 300 por sessão.',      // ex.: 'Fazemos clareamento, lentes, limpeza e ortodontia.'
 };
 // categoria, descrição da etapa, e produtos: [id, nome, preço (null = consultar), descrição, necessidades, uso]
 const CATEGORIAS = [
@@ -720,78 +724,79 @@ const CATEGORIAS = [
   ['kmc','Kit miniatura Centella',225,'Acalma a pele e fortalece a barreira cutânea.','sensivel','Rotina completa em tamanho de viagem.'],
  ]],
 ];
-// categorias de procedimentos: [nome, foto, frase, [[id, nome, descrição, palavras-chave separadas por |]]]
-// categorias de procedimentos: [nome, foto, frase, [[id, nome, descrição, palavras-chave (|), preços [[opção, valor]] ]]]
-// preços vazios = "Valor após avaliação"
 // categorias de procedimentos: [nome, foto, frase, [[id, nome, descrição, palavras-chave (|), preços [[opção, valor]] ]]]
 // preços vazios = "Valor após avaliação"
 const PROC_CATS = [
  ['Preenchimentos e volumizadores','procedimento','Com ácido hialurônico, para volume, contorno e equilíbrio do rosto.',[
-  ['labial','Preenchimento labial','Aumenta o volume, define o contorno e corrige assimetrias dos lábios.','labial|labio|boca|beico',[['Preenchimento labial',900]]],
-  ['rino','Rinomodelação','Modela o nariz sem cirurgia: disfarça a giba ("ossinho") ou empina a ponta.','rino|nariz|giba|ossinho',[['Rinomodelação',900]]],
-  ['mento','Preenchimento de mento (queixo)','Aumenta, projeta ou corrige a forma do queixo para equilibrar o perfil.','mento|queixo',[['Mento',900],['Mento (2 ml)',1500]]],
-  ['perfil','Perfilplastia','Harmoniza o perfil equilibrando nariz, lábios e queixo.','perfilplastia|perfil',[['Perfilplastia',2500]]],
-  ['mandibula','Preenchimento de mandíbula','Define o contorno entre o rosto e o pescoço, deixando o maxilar mais desenhado.','mandibula|maxilar|contorno do rosto',[['Mandíbula (2 ml)',1500],['Mandíbula (4 ml)',2400],['Mandíbula (6 ml)',3000]]],
-  ['malar','Preenchimento malar','Dá volume e projeção às maçãs do rosto, com efeito de sustentação.','malar|macas do rosto|maca do rosto|bochecha',[['Malar (2 ml)',1500],['Malar (4 ml) com bigode chinês',2400]]],
-  ['sulco','Preenchimento de sulco nasogeniano','Suaviza o "bigode chinês", a linha que vai da lateral do nariz ao canto da boca.','bigode chines|nasogeniano|sulco',[['Malar (4 ml) com bigode chinês',2400]]],
-  ['olheiras','Preenchimento de olheiras','Preenche a cavidade abaixo dos olhos e tira o aspecto de olhar cansado.','olheira|olhar cansado|olho fundo',[]],
-  ['marionete','Preenchimento de linhas de marionete','Corrige os vincos que descem dos cantos da boca até o queixo, que dão aspecto de tristeza.','marionete|canto da boca|tristeza',[]],
+  ['labial','Preenchimento labial','Natural lips: pode usar mais de 1 ml, preservando um resultado natural e harmônico. Lábios volumosos: 2 ml ou mais, pra lábios mais cheios mantendo o contorno e o equilíbrio.','labial|labio|boca|beico|natural lips|volumoso',[['Natural lips',900],['Lábios volumosos',1500]]],
+  ['rino','Rinomodelação','Com ácido hialurônico, mediante avaliação: regulariza o dorso ou empina a pontinha do nariz, pra harmonia do perfil.','rino|nariz|giba|ossinho|dorso|pontinha',[['Rinomodelação',1000]]],
+  ['mento','Preenchimento de mento (queixo)','2 ml ou mais pra projetar o queixo: na horizontal harmoniza o perfil, na vertical alonga o rosto.','mento|queixo',[['Preenchimento de mento',1500]]],
+  ['mandibula','Preenchimento de mandíbula','Trabalha todo o contorno facial, com projeção e marcação. Podem ser usados mais de 5 ml pro resultado ideal.','mandibula|maxilar|contorno do rosto|contorno facial',[['Preenchimento de mandíbula',3000]]],
+  ['malar','Preenchimento malar','Preenche a região de sustentação das maçãs do rosto, em média 2 ml.','malar|macas do rosto|maca do rosto|bochecha',[['Preenchimento malar',1500]]],
+  ['sulco','Preenchimento de bigode chinês','Suaviza superficialmente o "bigode chinês", a linha que vai da lateral do nariz ao canto da boca.','bigode chines|nasogeniano|sulco',[['Bigode chinês',900]]],
+  ['olheiras','Preenchimento de olheiras','Suaviza a profundidade da região abaixo dos olhos e tira o aspecto de olhar cansado.','olheira|olhar cansado|olho fundo',[['Olheiras',1000]]],
+  ['marionete','Preenchimento de marionete','Suaviza a marcação dos ângulos da boca, que dá aspecto de tristeza.','marionete|canto da boca|tristeza|angulo da boca',[['Marionete',1200]]],
   ['temporas','Preenchimento de têmporas','Repõe o volume na lateral da testa e ajuda a levantar a cauda da sobrancelha.','tempora|lateral da testa|sobrancelha caida',[]],
-  ['mdcodes','MD Codes','Técnica de mapeamento que aplica ácido hialurônico em pontos estratégicos para levantar o rosto (efeito lifting).','md codes|mdcodes|medical codes|levantar o rosto|lifting',[]],
+  ['mdcodes','MD Codes','Técnica de mapeamento que aplica ácido hialurônico em pontos estratégicos pra levantar o rosto (efeito lifting).','md codes|mdcodes|medical codes|levantar o rosto',[]],
  ]],
- ['Relaxamento muscular','marcacao','Toxina botulínica para suavizar e prevenir linhas de expressão.',[
-  ['botox','Toxina botulínica (Botox, Dysport, Xeomin)','Suaviza e previne rugas na testa, entre as sobrancelhas e ao redor dos olhos (pés de galinha).','botox|toxina|dysport|xeomin|testa|pe de galinha|pes de galinha|ruga|linha de expressao|linhas de expressao',[['Botox preventivo',580],['Botox convencional',800],['Botox full face',1100]]],
-  ['masseter','Botox no masseter','No músculo da mastigação, para afinar o rosto quadrado ou aliviar o bruxismo.','masseter|bruxismo|rosto quadrado|ranger',[]],
-  ['nefertiti','Botox Nefertiti','No pescoço e na linha da mandíbula, para melhorar o contorno do rosto.','nefertiti|pescoco',[]],
-  ['gengival','Sorriso gengival','Diminui a exposição da gengiva ao sorrir.','gengival|gengiva|sorriso',[]],
+ ['Relaxamento muscular','marcacao','Toxina botulínica personalizada pra força muscular de cada paciente.',[
+  ['botox','Toxina botulínica (Botox)','Protocolo personalizado de acordo com a necessidade e a força muscular de cada paciente, com aplicação em todas as regiões necessárias.','botox|toxina|dysport|xeomin|testa|pe de galinha|pes de galinha|ruga|linha de expressao|linhas de expressao|preventivo|funcional',[['Botox preventivo',650],['Botox convencional',900],['Botox funcional',1200]]],
+  ['masseter','Botox no masseter','No músculo da mastigação, pra afinar o rosto quadrado ou aliviar o bruxismo.','masseter|bruxismo|rosto quadrado|ranger',[]],
+  ['nefertiti','Botox Nefertiti','No pescoço e na linha da mandíbula, pra melhorar o contorno do rosto.','nefertiti|pescoco',[]],
+  ['gengival','Sorriso gengival','Diminui a exposição da gengiva ao sorrir.','gengival|gengiva',[]],
  ]],
- ['Colágeno e firmeza','seringa','Para flacidez e sustentação, estimulando o colágeno da própria pele.',[
-  ['bioestimulador','Bioestimuladores de colágeno','Sculptra, Eleva e Diamond: estimulam o corpo a produzir colágeno novo e combatem a flacidez.','bioestimulador|sculptra|radiesse|eleva|elleva|diamond|colageno|flacidez',[['Sculptra (rosto)',1500],['Eleva (rosto)',1300],['Eleva (rosto + pescoço)',2000],['Diamond (1,25 ml)',900],['Diamond (2,5 ml)',1500]]],
-  ['ultrassom','Ultrassom microfocado','Ultraformer ou Liftera: firmeza e efeito lifting sem agulhas.','ultrassom|ultraformer|liftera|sem agulha',[['Ultrassom (rosto)',800],['Ultrassom (papada)',600],['Ultrassom (rosto e pescoço)',1500]]],
-  ['fios','Fios de sustentação (PDO)','Fios absorvíveis que levantam tecidos caídos e estimulam colágeno.','fios|fio de pdo|pdo|sustentacao',[]],
+ ['Colágeno e firmeza','seringa','Pra flacidez e sustentação, estimulando o colágeno da própria pele.',[
+  ['bioestimulador','Bioestimulador de colágeno','Trabalha a densidade da pele, tratando a flacidez. Usamos Sculptra, Eleva, Radiesse e Diamond, com indicação personalizada.','bioestimulador|sculptra|radiesse|eleva|elleva|diamond|colageno|flacidez|densidade',[['Bioestimulador de colágeno',1500]]],
+  ['ultrassom','Ultrassom microfocado','Tecnologia pra flacidez, redução de volume e melhora da qualidade da pele.','ultrassom|ultraformer|liftera|sem agulha|microfocado',[['Ultrassom (rosto)',400],['Ultrassom (papada e pescoço)',400],['Ultrassom (rosto e pescoço)',600]]],
+  ['fios','Fios de sustentação (PDO)','Fios absorvíveis que levantam tecidos caídos e estimulam colágeno.','fios|fio de pdo|pdo|pontos de sustentacao',[]],
  ]],
- ['Redução de gordura e afinamento','ombro','Para afinar o rosto e o contorno.',[
+ ['Redução de gordura e afinamento','ombro','Pra afinar o rosto e o contorno.',[
   ['papada','Lipo de papada enzimática','Injeções que quebram a gordura abaixo do queixo e reduzem o "queixo duplo".','papada|queixo duplo|lipo enzimatica',[]],
-  ['emptiers','Esvaziadores de gordura (Emptiers)','Enzimas em pequenas bolsas de gordura do rosto para afinar e dar leveza.','emptier|esvaziador|bolsa de gordura|bolsinha',[]],
-  ['bichectomia','Bichectomia','Pequena cirurgia por dentro da boca que remove parte da gordura das bochechas para afinar o rosto.','bichectomia|bichat|afinar o rosto|afinar rosto',[]],
+  ['emptiers','Esvaziadores de gordura (Emptiers)','Enzimas em pequenas bolsas de gordura do rosto pra afinar e dar leveza.','emptier|esvaziador|bolsa de gordura|bolsinha',[]],
+  ['bichectomia','Bichectomia','Pequena cirurgia por dentro da boca que remove parte da gordura das bochechas pra afinar o rosto.','bichectomia|bichat|afinar o rosto|afinar rosto',[]],
  ]],
  ['Qualidade e hidratação da pele','logo','Viço, textura, manchas e hidratação profunda.',[
-  ['glassskin','Protocolo Glass Skin (peeling coreano)','Pele de porcelana, com viço e luminosidade: renova a pele de forma progressiva, melhora textura, uniformiza o tom, reduz manchas, estimula colágeno e ajuda no controle da oleosidade e da acne.','glass skin|glassskin|peeling coreano|pele de porcelana|glow',[]],
-  ['microagulhamento','Microagulhamento','Microagulhas que estimulam colágeno e ajudam a entrada de vitaminas e clareadores. Com subcisão, também trata cicatrizes.','microagulhamento|drug delivery|ipca|cicatriz|subcisao',[['Microagulhamento',200],['Microagulhamento com subcisão',250]]],
-  ['laser','Laser de CO2','Renovação da pele para textura, manchas e uniformidade.','laser|co2',[['Laser de CO2',800]]],
+  ['glassskin','Peeling coreano (Glass Skin)','Renovação superficial da pele: melhora a uniformidade do tom, a textura e a luminosidade, com aparência mais saudável e revitalizada.','glass skin|glassskin|peeling coreano|pele de porcelana|glow',[['Peeling coreano',150]]],
+  ['pdrn','Indução percutânea com PDRN','Estimula colágeno, favorece a regeneração celular, melhora textura e qualidade da pele, suaviza linhas finas, hidrata e devolve luminosidade e viço.','pdrn|inducao percutanea|polinucleotideo|esperma de salmao|salmao',[['Indução com PDRN',250]]],
+  ['laser','Laser de CO2','Queimadura controlada que estimula a regeneração da pele, reduzindo linhas, manchas e cicatrizes. Feito em datas específicas, quando a clínica está com a máquina.','laser|co2',[['Laser CO2 Glow',600],['Laser CO2 rejuvenescimento',800],['Laser CO2 clareamento ou cicatrizes',800]]],
+  ['microagulhamento','Microagulhamento','Microagulhas que estimulam colágeno e ajudam a entrada de ativos. Com subcisão, também trata cicatrizes.','microagulhamento|drug delivery|ipca|cicatriz|subcisao',[]],
   ['skinbooster','Skinbooster','Ácido hialurônico bem fino que hidrata a pele por dentro, com brilho e maciez, sem dar volume.','skinbooster|skin booster|vico|hidratacao profunda',[]],
   ['peeling','Peeling químico','Ácidos que renovam a pele e melhoram manchas, poros dilatados e textura.','peeling quimico|acido na pele|renovar a pele',[]],
  ]],
  ['Odontologia estética','consultorio','Sorriso mais bonito e harmônico, com planejamento personalizado.',[
-  ['lentes','Lentes em resina','Facetas em resina que corrigem cor, forma e pequenas imperfeições dos dentes.','lente|lentes|faceta|facetas|resina',[]],
-  ['recontorno','Recontorno dental','Ajuste fino no formato dos dentes para um sorriso mais harmônico.','recontorno|formato dos dentes|dente torto',[]],
+  ['avalodonto','Avaliação odontológica','Personalização da estética do sorriso com planejamento individualizado.','avaliacao odontologica|dentista|consulta odontologica',[['Avaliação odontológica',100]]],
+  ['limpeza','Limpeza completa','Além da escovinha: raspagem de tártaro, jato de bicarbonato, instrução de higiene oral e polimento de resinas.','limpeza|tartaro|raspagem|bicarbonato|profilaxia',[['Limpeza completa',250]]],
+  ['facetas','Manutenção e reparo de facetas','Limpeza completa, polimento e reparo de lentes parcialmente fraturadas. Reparo pra trinca de até metade do dente.','manutencao de faceta|manutencao de lente|reparo|lente quebrada|lente trincada|faceta quebrada',[['Reparo de facetas',150],['Manutenção de facetas',350],['Manutenção de lentes feitas por outro profissional',450]]],
+  ['recontorno','Recontorno dental (6 dentes)','Harmoniza o sorriso com acréscimos estratégicos em resina, preservando a naturalidade.','recontorno|formato dos dentes|dente torto',[['Recontorno 6 dentes',1500]]],
+  ['lentes','Lentes estratificadas em resina (10 dentes)','Facetas com naturalidade que entregam harmonia completa pra um sorriso transformado.','lente|lentes|faceta|facetas|resina',[['Lentes em resina 10 dentes',3000]]],
   ['diastema','Fechamento de diastema','Fecha os espaços entre os dentes, sem aparelho.','diastema|espaco entre os dentes|dente separado|dentes separados',[]],
-  ['clarcaseiro','Clareamento caseiro','Clareamento feito em casa com moldeira personalizada, com acompanhamento.','clareamento caseiro|moldeira',[]],
-  ['clarconsultorio','Clareamento de consultório','Clareamento feito na clínica, com resultado mais rápido.','clareamento de consultorio|clareamento|clarear os dentes|clarear dente|dentes amarelos|dente amarelo',[]],
+  ['clarcaseiro','Clareamento caseiro','Inclui limpeza e o kit completo pro clareamento em casa.','clareamento caseiro|moldeira|kit de clareamento',[['Clareamento caseiro',700]]],
+  ['clarconsultorio','Clareamento de consultório','1 sessão de clareamento feita pelo profissional no consultório.','clareamento de consultorio|clareamento|clarear os dentes|clarear dente|dentes amarelos|dente amarelo',[['Clareamento de consultório',300]]],
  ]],
 ];
 const PROCEDIMENTOS = PROC_CATS.flatMap(([c,,,l])=>l.map(p=>[p[0],p[1],p[2],p[3],c,p[4]||[]]));
-// combos: [id, nome, descrição, preço]
+// protocolos (combos): [id, nome, descrição, preço]
 const COMBOS = [
- ['c-botoxboca','Botox e boca','Expressão mais leve e lábios mais harmoniosos.',1500],
- ['c-botoxlaser','Botox e laser','Expressão mais leve e uma pele mais uniforme.',1100],
- ['c-ultrabio','Ultrassom microfocado + bioestimulador (rosto)','Firmeza e estímulo de colágeno no rosto.',2500],
- ['c-ultrabiop','Ultrassom microfocado + bioestimulador (rosto e pescoço)','Firmeza e estímulo de colágeno no rosto e pescoço.',3500],
- ['c-firming','Protocolo Firming Lift','3 ml de ácido hialurônico + 1,25 ml de Diamond.',2500],
+ ['c-botoxboca','Botox + boca','Protocolo queridinho: expressão leve e lábios harmoniosos.',1600],
+ ['c-perfil','Perfilplastia (nariz + boca + mento)','Protocolo harmonia: equilibra nariz, lábios e queixo.',2700],
+ ['c-rugas','Botox + PDRN + peeling coreano','Protocolo rugas e linhas de expressão.',1000],
+ ['c-pele','Botox + laser de CO2 + peeling coreano','Protocolo pele dos sonhos.',1500],
+ ['c-ultrabio','Ultrassom + bioestimulador de colágeno','Protocolo pra flacidez.',2200],
+ ['c-lifting','Ultrassom + bioestimulador + pontos de sustentação','Protocolo lifting facial.',3200],
 ];
 const OBJETIVOS = [
- ['Rugas e linhas de expressão',['botox','skinbooster','mdcodes']],
+ ['Rugas e linhas de expressão',['botox','pdrn','skinbooster','mdcodes']],
  ['Flacidez e firmeza',['bioestimulador','ultrassom','fios','mdcodes']],
- ['Contorno e perfil',['perfil','mandibula','mento','rino','malar']],
+ ['Contorno e perfil',['mandibula','mento','rino','malar']],
  ['Lábios e sorriso',['labial','gengival']],
  ['Olhar cansado',['olheiras','temporas','botox']],
  ['Afinar o rosto',['papada','masseter','emptiers','bichectomia']],
- ['Manchas, poros e textura',['glassskin','laser','microagulhamento','peeling']],
- ['Sorriso e dentes',['lentes','clarconsultorio','clarcaseiro','diastema','recontorno','gengival']],
+ ['Manchas, poros e textura',['glassskin','pdrn','laser','microagulhamento','peeling']],
+ ['Sorriso e dentes',['avalodonto','limpeza','lentes','recontorno','clarconsultorio','clarcaseiro','facetas','diastema']],
 ];
 const fmtR = v => 'R$ ' + v.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
-const precoTxt = precos => !precos.length ? 'Valor na avaliação' : 'a partir de ' + fmtR(Math.min(...precos.map(x => x[1])));
-const NOTA_PRECO = 'Os valores são "a partir de" e podem variar de acordo com a personalização do protocolo, definida na avaliação.';
+const precoTxt = precos => !precos.length ? 'Valor na avaliação' : precos.length===1 ? fmtR(precos[0][1]) : 'a partir de ' + fmtR(Math.min(...precos.map(x => x[1])));
+const NOTA_PRECO = 'Os valores podem variar de acordo com a personalização do protocolo, definida na avaliação.';
 
 const MENTORIA_INFO = {
   vagas: 'Só 4 vagas por turma — estão acabando!',
@@ -889,7 +894,9 @@ function mostrarDica(p){
 function comboSugerido(){
   const tem=(...ids)=>ids.every(i=>S.procs.has(i));
   if(tem('botox','labial')&&!S.combos.has('c-botoxboca'))return COMBOS.find(c=>c[0]==='c-botoxboca');
-  if(tem('botox','laser')&&!S.combos.has('c-botoxlaser'))return COMBOS.find(c=>c[0]==='c-botoxlaser');
+  if(tem('botox','laser')&&!S.combos.has('c-pele'))return COMBOS.find(c=>c[0]==='c-pele');
+  if(tem('botox','pdrn')&&!S.combos.has('c-rugas'))return COMBOS.find(c=>c[0]==='c-rugas');
+  if((tem('rino','labial')||tem('rino','mento')||tem('labial','mento'))&&!S.combos.has('c-perfil'))return COMBOS.find(c=>c[0]==='c-perfil');
   if((tem('bioestimulador','ultrassom'))&&!S.combos.has('c-ultrabio'))return COMBOS.find(c=>c[0]==='c-ultrabio');
   return null;
 }
@@ -1034,9 +1041,18 @@ function fluxoAgendar(){
   const d=fala(`Vamos agendar, ${S.nome}! 💛 Vou abrir a agenda da clínica pra você ver os horários livres…`);
   carregarAgenda().then(()=>{
     if(!AG.servicos.length)throw new Error('vazia');
-    fala('Qual atendimento você quer agendar?');
-    opcoes(AG.servicos.map(sv=>({t:`${sv.nome} · ${sv.duracao_min} min`,f:()=>{S.reserva.serv=sv;S.agenda.interesse=sv.nome;escolherDia()}})));
+    escolherCategoria();
   }).catch(()=>{fala('Não consegui abrir a agenda online agora 😕 Sem problema: eu anoto sua preferência e a equipe confirma o horário pelo WhatsApp.');setTimeout(()=>{S.agenda={};fluxoAgendarPrefSemNome()},400)});
+}
+function escolherCategoria(){
+  const on=AG.servicos.filter(sv=>sv.online!==false);
+  const cats=[...new Set(on.map(sv=>sv.categoria||'Atendimentos'))];
+  const lista=cat=>{const l=on.filter(sv=>(sv.categoria||'Atendimentos')===cat);
+    fala(cat==='Avaliações'?'Qual avaliação? 😊':`Qual desses você quer agendar?`);
+    opcoes([...l.map(sv=>({t:`${sv.nome.replace(/ \(avaliação\)$/,'')}${sv.preco?` · ${fmtR(+sv.preco)}`:''} · ${sv.duracao_min} min`,f:()=>{S.reserva.serv=sv;S.agenda.interesse=sv.nome;escolherDia()}})),{t:'← Voltar',f:escolherCategoria}]);};
+  if(cats.length<=1){lista(cats[0]);return}
+  fala('O que você quer agendar? Se ainda não sabe qual procedimento fazer, comece pela avaliação: ela não é cobrada se você fizer algum procedimento. 💛');
+  opcoes([...cats.map(c=>({t:c,f:()=>lista(c)})),...(AG.servicos.some(sv=>sv.online===false)?[{t:'Laser de CO2',f:()=>{fala('O laser de CO2 é feito em datas específicas, quando a clínica está com a máquina. Te passo pro WhatsApp que a equipe te avisa a próxima data. 💛');S.agenda={interesse:'Laser de CO2',periodo:'Próxima data do laser',quando:'a confirmar'};revisao()}}]:[])]);
 }
 function fluxoAgendarPrefSemNome(){const n=S.nome;fluxoAgendarPref();S.nome=n}
 function escolherDia(){
@@ -1064,7 +1080,7 @@ function pedirTelefone(){
 }
 function confirmarReserva(){
   const r=S.reserva;
-  fala(`Confere pra mim:\n\n📅 ${r.serv.nome}\n🗓 ${SEM[new Date(r.data+'T12:00').getDay()]}, ${brData(r.data)} às ${r.hora} (${r.serv.duracao_min} min)\n👤 ${S.nomeCompleto||S.nome} · ${r.tel}${/avalia/i.test(r.serv.nome)?'\n\nA avaliação é uma consulta personalizada de R$ 100,00, convertidos no procedimento se você decidir fazer.':''}`);
+  fala(`Confere pra mim:\n\n📅 ${r.serv.nome}\n🗓 ${SEM[new Date(r.data+'T12:00').getDay()]}, ${brData(r.data)} às ${r.hora} (${r.serv.duracao_min} min)\n👤 ${S.nomeCompleto||S.nome} · ${r.tel}${/avalia/i.test(r.serv.nome)?'\n\nA avaliação é uma consulta personalizada de R$ 100,00, que não são cobrados se você fizer algum procedimento.':''}`);
   opcoes([{t:'Confirmar agendamento',go:true,f:reservar},{t:'Trocar horário',f:escolherHora},{t:'Trocar atendimento',f:fluxoAgendar}]);
 }
 async function reservar(){
@@ -1089,17 +1105,17 @@ function ag3(){const per=S.agenda.periodo;fala(`E qual dia da semana fica melhor
 function ag4(){fala('Última: você já fez algum procedimento estético antes?');opcoes([{t:'Sim, já fiz',f:()=>{S.resp.jaFez='Sim';agFim()}},{t:'Não, seria a primeira vez',f:()=>{S.resp.jaFez='Não, primeira vez';agFim()}}])}
 function agFim(){
   const q=S.agenda.quando;const quando=['O quanto antes','Tanto faz'].includes(q)?q.toLowerCase():(['Segunda','Terça','Quarta','Quinta','Sexta'].includes(q)?q.toLowerCase()+'-feira':q.toLowerCase());
-  fala(`Perfeito, ${S.nome}! Anotei sua preferência: ${S.agenda.periodo.toLowerCase()}, ${quando}. 💛\n\nSó pra você saber: a avaliação é uma consulta personalizada com a Dra. Angélica e custa R$ 100,00. Se decidir fazer o procedimento, esse valor é convertido no tratamento. Aceitamos dinheiro, Pix e cartão em até 10x, e tem estacionamento no pátio comercial.\n\nA equipe confere a agenda e te confirma o dia e o horário certinho pelo WhatsApp.`);
+  fala(`Perfeito, ${S.nome}! Anotei sua preferência: ${S.agenda.periodo.toLowerCase()}, ${quando}. 💛\n\nSó pra você saber: a avaliação é uma consulta personalizada com a Dra. Angélica e custa R$ 100,00. Se decidir fazer o procedimento, esse valor é não cobrado se você fizer algum procedimento. Aceitamos dinheiro, Pix e cartão em até 10x, e tem estacionamento no pátio comercial.\n\nA equipe confere a agenda e te confirma o dia e o horário certinho pelo WhatsApp.`);
   setTimeout(revisao,600);
 }
 
 /* valores e combos */
 const listaPrecos=cat=>PROCEDIMENTOS.filter(p=>p[4]===cat&&p[5].length&&p[0]!=='sulco').map(p=>p[5].map(([o,v])=>`• ${o}: a partir de ${fmtR(v)}`).join('\n')).join('\n');
 function fluxoValores(){fala('Quais valores você quer ver?');opcoes([
-  {t:'Harmonização facial',f:()=>{fala('Harmonização facial:\n\n'+['Relaxamento muscular','Preenchimentos e volumizadores'].map(listaPrecos).join('\n')+'\n\n'+NOTA_PRECO+'');verProcs(['botox','labial','rino','mento','perfil','mandibula','malar'])}},
-  {t:'Estímulo de colágeno',f:()=>{fala('Estímulo de colágeno:\n\n'+listaPrecos('Colágeno e firmeza')+'\n'+listaPrecos('Qualidade e hidratação da pele')+'\n\n'+NOTA_PRECO+'');verProcs(['bioestimulador','ultrassom','microagulhamento','laser'])}},
-  {t:'Combos queridinhos',f:fluxoCombos},
-  {t:'Glass Skin (peeling coreano)',f:()=>{const g=PROCEDIMENTOS.find(p=>p[0]==='glassskin');fala(`Protocolo Glass Skin, o peeling coreano: ${g[2]}\n\nO valor a equipe passa pelo WhatsApp.`);verProcs(['glassskin'])}},
+  {t:'Harmonização facial',f:()=>{fala('Harmonização facial:\n\n'+['Relaxamento muscular','Preenchimentos e volumizadores'].map(listaPrecos).join('\n')+'\n\n'+NOTA_PRECO+'');verProcs(['botox','labial','rino','mento','mandibula','malar','olheiras'])}},
+  {t:'Estímulo de colágeno',f:()=>{fala('Estímulo de colágeno:\n\n'+listaPrecos('Colágeno e firmeza')+'\n'+listaPrecos('Qualidade e hidratação da pele')+'\n\n'+NOTA_PRECO+'');verProcs(['bioestimulador','ultrassom','pdrn','laser'])}},
+  {t:'Protocolos',f:fluxoCombos},
+  {t:'Glass Skin (peeling coreano)',f:()=>{const g=PROCEDIMENTOS.find(p=>p[0]==='glassskin');fala(`Peeling coreano (Glass Skin): ${g[2]}\n\nValor: ${fmtR(g[5][0][1])}, sessão de cerca de 30 min.`);verProcs(['glassskin'])}},
 ])}
 function verProcs(ids){procEscolher(ids.map(id=>PROCEDIMENTOS.find(p=>p[0]===id)),'Marque o que te interessa:')}
 function fluxoCombos(){
@@ -1147,7 +1163,7 @@ function responder(txt){
   if(tem('obrigad','valeu'))return{r:`Imagina${S.nome?`, ${S.nome}`:''}! Foi um prazer te ajudar 💛 Quando quiser, é só tocar em “Finalizar e enviar” que a equipe te atende no WhatsApp.`};
   if(tem('nao sei','indica','me ajuda a escolher','qual escolher','qual o melhor','qual a melhor','o que voce recomenda','recomenda','me sugere','sugestao','duvida entre'))return{r:'Claro, te ajudo! 😊 Me diz o que você quer: cuidar da pele em casa ou fazer um procedimento?',o:[{t:'Montar rotina de skincare',go:true,f:fluxoRotina},{t:'Procedimento pelo resultado',f:procObjetivo},{t:'Ver combos',f:fluxoCombos}]};
   if(tem('vergonha','insegur','incomoda','odeio','nao gosto do meu','triste com','autoestima'))return{r:'Te entendo, e saiba que você não é a única pessoa que sente isso 💛 Muita gente chega aqui sentindo o mesmo. A Dra. Angélica trabalha com resultados naturais, respeitando o seu rosto. Quer me contar o que mais te incomoda pra eu te mostrar as opções?',o:[{t:'Escolher pelo resultado',go:true,f:procObjetivo},{t:'Cuidar da pele',f:fluxoSkin}]};
-  if(tem('caro','muito caro','sem dinheiro','apertad','mais barato','desconto','parcel'))return{r:'Entendo totalmente 💛 Algumas opções pra caber no bolso: o botox preventivo sai por R$ 580,00, o microagulhamento por R$ 200,00, e os combos juntam dois tratamentos num valor só. E a gente aceita dinheiro, Pix e cartão em até 10x, o que ajuda a encaixar no orçamento. Quer que eu te mostre os combos?',o:[{t:'Ver combos',go:true,f:fluxoCombos},{t:'Valores dos procedimentos',f:fluxoValores}]};
+  if(tem('caro','muito caro','sem dinheiro','apertad','mais barato','desconto','parcel'))return{r:'Entendo totalmente 💛 Algumas opções pra caber no bolso: o peeling coreano sai por R$ 150,00, a indução com PDRN por R$ 250,00, o ultrassom microfocado a partir de R$ 400,00, o botox preventivo por R$ 650,00, e os combos juntam dois tratamentos num valor só. E a gente aceita dinheiro, Pix e cartão em até 10x, o que ajuda a encaixar no orçamento. Quer que eu te mostre os combos?',o:[{t:'Ver combos',go:true,f:fluxoCombos},{t:'Valores dos procedimentos',f:fluxoValores}]};
   if(tem('linda','maravilhos','amei','adorei','perfeit','top demais'))return{r:'Ahh, que gentileza! 🥰 Fico muito feliz. Posso te ajudar em mais alguma coisa?',o:MENU().slice(0,4)};
   if(tem('agendar','agenda','marcar','avaliacao','consulta')&&!tem('mentoria','curso','aula','modulo','quanto','preco','valor'))return{f:fluxoAgendar};
   if(tem('horario','disponib','que dia','qual dia','amanha','hoje')&&!tem('mentoria','curso','aula','modulo'))return{r:'O dia e o horário são combinados direto pelo WhatsApp com a equipe da Santé. Escolha o que você quer aqui e toque em “Finalizar e enviar”: a mensagem já vai pronta.'+(CLINICA.horario?`\n\nNosso horário de funcionamento: ${CLINICA.horario}.`:'')};
@@ -1193,7 +1209,7 @@ function responder(txt){
   if(nomeados.length&&nomeados.length<=4)return{r:nomeados.map(p=>`${p.nome} — ${brl(p.preco)}\n${p.desc}\nComo usar: ${p.uso}`).join('\n\n'),c:nomeados};
   if(tem('rotina','por onde comec','ordem','como usar','passo'))return{r:'A ordem básica é:\n\nManhã: limpeza → tônico → sérum → hidratante → protetor solar.\nNoite: dupla limpeza (óleo + sabonete) → tratamento (retinal ou clareador) → hidratante.\n\nQuer que eu monte uma rotina pra você?',o:[{t:'Montar minha rotina',f:fluxoRotina}]};
   if(nec.length){const l=P.map(p=>({p,s:nec.filter(n=>p.tags.includes(n)).length})).filter(x=>x.s).sort((a,b)=>b.s-a.s).slice(0,5).map(x=>x.p);return{r:`Para ${nec.map(n=>LBL[n]||n).join(' e ')}, estas opções combinam bem. Toque em Adicionar no que quiser:`,c:l}}
-  if(tem('preco','valor','quanto','custa'))return{r:'Me diga o nome do produto ou o que você quer tratar (ex.: protetor para pele oleosa) que eu te mostro. Para procedimentos, me diga qual (ex.: quanto custa o botox?) ou veja a tabela completa.',o:[{t:'Ver valores dos procedimentos',go:true,f:fluxoValores},{t:'Combos queridinhos',f:fluxoCombos}]};
+  if(tem('preco','valor','quanto','custa'))return{r:'Me diga o nome do produto ou o que você quer tratar (ex.: protetor para pele oleosa) que eu te mostro. Para procedimentos, me diga qual (ex.: quanto custa o botox?) ou veja a tabela completa.',o:[{t:'Ver valores dos procedimentos',go:true,f:fluxoValores},{t:'Protocolos',f:fluxoCombos}]};
   if(tem(' oi ',' ola','bom dia','boa tarde','boa noite'))return{r:`Olá${S.nome?`, ${S.nome}`:''}! Como posso te ajudar?`,o:MENU()};
   return{r:'Hmm, essa eu não sei te responder com certeza, e não quero te passar informação errada 😊 Mas a equipe te responde rapidinho pelo WhatsApp. Posso deixar sua dúvida na mensagem, ou te ajudar com skincare, procedimentos, a mentoria ou o endereço.',o:[{t:'Mandar minha dúvida no WhatsApp',go:true,f:()=>{S.resp.duvida=txt;revisao()}},...MENU().slice(0,3)]};
 }

@@ -381,7 +381,9 @@ const toHM = m => pad(Math.floor(m/60)) + ":" + pad(m%60);
 function prepararNovo(){
   const ativos = servicos.filter(s => s.ativo);
   const atual = $("nSv").value;
-  $("nSv").innerHTML = ativos.map(s => `<option value="${s.id}">${esc(s.nome)} · ${s.duracao_min} min</option>`).join("");
+  const grupos = [...new Set(ativos.map(s => s.categoria || "Outros"))];
+  const opt = s => `<option value="${s.id}">${esc(s.nome)} · ${s.duracao_min} min${s.preco?` · R$ ${(+s.preco).toLocaleString("pt-BR")}`:""}</option>`;
+  $("nSv").innerHTML = grupos.map(g => `<optgroup label="${esc(g)}">${ativos.filter(s => (s.categoria||"Outros")===g).map(opt).join("")}</optgroup>`).join("");
   if (atual && ativos.some(s => String(s.id)===atual)) $("nSv").value = atual;
   if (!$("nDia").value) $("nDia").value = hojeStr();
   carregarSlots();
