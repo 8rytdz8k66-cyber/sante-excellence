@@ -129,6 +129,10 @@
   .tag.wa{background:#e6f9ee;color:#128c4a}
   .nav .bdg{position:absolute;top:2px;margin-left:22px;min-width:17px;height:17px;border-radius:9px;background:var(--err);color:#fff;font-size:10px;line-height:17px;padding:0 4px;font-style:normal}
   .nav button{position:relative}
+  .slots{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+  .slot{padding:10px 12px;border-radius:12px;background:#fff;border:1px solid var(--line);font-weight:600;font-size:14px;min-width:66px}
+  .slot.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .fab{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;margin-top:12px;padding:12px;border-radius:14px;border:1.5px dashed var(--gold);color:var(--gold);font-weight:700;background:var(--goldbg)}
   /* barra de abas */
   .nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:rgba(255,253,250,.97);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
   .nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:12px;font-size:11px;font-weight:600;color:var(--muted)}
@@ -177,6 +181,23 @@
       </div>
       <div class="stats" id="stat"></div>
       <div id="lista"></div>
+      <button class="fab" id="agNovo">＋ Agendar neste dia</button>
+    </section>
+
+    <!-- AGENDAR MANUAL -->
+    <section class="tab" id="t-nv">
+      <h2 class="h2">Novo agendamento</h2>
+      <form class="card" id="fn">
+        <label class="lbl" style="margin-top:0">Nome da cliente</label><input id="nNome" required autocomplete="off" placeholder="Nome completo">
+        <label class="lbl">WhatsApp</label><input id="nTel" type="tel" inputmode="tel" required placeholder="(85) 9 9999-9999">
+        <label class="lbl">Procedimento</label><select id="nSv" required></select>
+        <label class="lbl">Dia</label><input id="nDia" type="date" required>
+        <label class="lbl">Horários livres</label><div class="slots" id="nSlots"></div>
+        <label class="lbl">Horário escolhido (ou digite outro pra encaixe)</label><input id="nHora" type="time" required>
+        <label class="lbl">Observação (opcional)</label><input id="nObs" placeholder="Ex.: veio por indicação">
+        <label class="row" style="display:flex;gap:8px;align-items:center;margin-top:12px;font-size:14px"><input type="checkbox" id="nConf" checked> Já confirmado com a cliente</label>
+        <button class="btn block" style="margin-top:14px" id="nBtn">Salvar agendamento</button>
+      </form>
     </section>
 
     <!-- PEDIDOS -->
@@ -207,15 +228,13 @@
     </section>
 
     <!-- SERVIÇOS -->
-    <section class="tab" id="t-sv">
+    <section class="tab" id="t-aj">
       <h2 class="h2">Procedimentos</h2>
       <p class="muted" style="font-size:14px;margin:-4px 2px 12px">Os ativos aparecem pra cliente na hora de agendar com a Lis.</p>
       <div id="lsv"></div>
       <button class="btn ghost block" id="novoSv">+ Novo procedimento</button>
-    </section>
-
+      <div style="height:26px"></div>
     <!-- HORÁRIOS -->
-    <section class="tab" id="t-hr">
       <h2 class="h2">Horário de funcionamento</h2>
       <p class="muted" style="font-size:14px;margin:-4px 2px 12px">O intervalo fica fechado pra agendamento. Deixe em branco se não tiver.</p>
       <div id="lhr"></div>
@@ -225,10 +244,10 @@
 
   <nav class="nav">
     <button class="on" data-t="ag"><i>📅</i>Agenda</button>
+    <button data-t="nv"><i>➕</i>Agendar</button>
     <button data-t="pd"><i>🛍️</i>Pedidos<em class="bdg" id="pdBdg" style="display:none"></em></button>
     <button data-t="bl"><i>⛔</i>Bloquear</button>
-    <button data-t="sv"><i>✨</i>Serviços</button>
-    <button data-t="hr"><i>🕘</i>Horários</button>
+    <button data-t="aj"><i>⚙️</i>Ajustes</button>
   </nav>
 </div>
 <div class="toast" id="toast"></div>
@@ -275,11 +294,14 @@ async function entrar(){
 }
 
 /* ---- abas ---- */
-document.querySelectorAll(".nav button").forEach(b => b.onclick = () => {
-  document.querySelectorAll(".nav button").forEach(x => x.classList.toggle("on", x===b));
-  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("on", t.id === "t-"+b.dataset.t));
+function abrirAba(t){
+  document.querySelectorAll(".nav button").forEach(x => x.classList.toggle("on", x.dataset.t===t));
+  document.querySelectorAll(".tab").forEach(x => x.classList.toggle("on", x.id === "t-"+t));
   scrollTo({top:0});
-});
+  if (t === "nv") prepararNovo();
+}
+document.querySelectorAll(".nav button").forEach(b => b.onclick = () => abrirAba(b.dataset.t));
+$("agNovo").onclick = () => { $("nDia").value = $("dia").value || hojeStr(); abrirAba("nv"); };
 $("atual").onclick = async () => { $("atual").innerHTML='<span class="spin">↻</span>'; await carregarAg(); await carregarBl(); await carregarPd(); $("atual").textContent="↻"; toast("Atualizado"); };
 
 /* ---- faixa de dias ---- */
@@ -352,6 +374,73 @@ async function carregarAg(){
     avisar(); carregarAg();
   });
 }
+
+/* ---- agendar manualmente ---- */
+const toMin = t => { const [h,m] = t.split(":").map(Number); return h*60+m; };
+const toHM = m => pad(Math.floor(m/60)) + ":" + pad(m%60);
+function prepararNovo(){
+  const ativos = servicos.filter(s => s.ativo);
+  const atual = $("nSv").value;
+  $("nSv").innerHTML = ativos.map(s => `<option value="${s.id}">${esc(s.nome)} · ${s.duracao_min} min</option>`).join("");
+  if (atual && ativos.some(s => String(s.id)===atual)) $("nSv").value = atual;
+  if (!$("nDia").value) $("nDia").value = hojeStr();
+  carregarSlots();
+}
+async function carregarSlots(){
+  const dia = $("nDia").value, sv = servicos.find(s => String(s.id) === $("nSv").value);
+  $("nSlots").innerHTML = '<span class="muted" style="font-size:14px">Carregando…</span>';
+  if (!dia || !sv){ $("nSlots").innerHTML = ""; return; }
+  const hr = horarios.find(h => h.dia_semana === dt(dia).getDay());
+  if (!hr || !hr.aberto){ $("nSlots").innerHTML = '<span class="muted" style="font-size:14px">Clínica fechada nesse dia. Se precisar, use o encaixe.</span>'; return; }
+  const { data: oc, error } = await sb.rpc("horarios_ocupados", { p_data: dia });
+  if (error){ $("nSlots").innerHTML = '<span class="muted" style="font-size:14px">Não consegui ver os horários. Use o encaixe.</span>'; return; }
+  const ocup = (oc||[]).map(o => [toMin(o.inicio), toMin(o.fim)]);
+  const agora = new Date(Date.now() - 3*3600e3 + new Date().getTimezoneOffset()*60e3);
+  const minAgora = dia === hojeStr() ? agora.getHours()*60 + agora.getMinutes() : -1;
+  const livres = [];
+  for (let m = toMin(hm(hr.inicio)); m + sv.duracao_min <= toMin(hm(hr.fim)); m += 30){
+    if (m <= minAgora) continue;
+    if (ocup.some(([a,b]) => m < b && m + sv.duracao_min > a)) continue;
+    livres.push(toHM(m));
+  }
+  $("nSlots").innerHTML = livres.length ? livres.map(h => `<button type="button" class="slot${h===$("nHora").value?" on":""}" data-h="${h}">${h}</button>`).join("")
+    : '<span class="muted" style="font-size:14px">Sem horário livre nesse dia. Use o encaixe ou escolha outro dia.</span>';
+  $("nSlots").querySelectorAll(".slot").forEach(b => b.onclick = () => { $("nHora").value = b.dataset.h; marcarSlot(); });
+}
+function marcarSlot(){ $("nSlots").querySelectorAll(".slot").forEach(b => b.classList.toggle("on", b.dataset.h === $("nHora").value)); }
+$("nDia").onchange = carregarSlots; $("nSv").onchange = carregarSlots; $("nHora").oninput = marcarSlot;
+$("nTel").addEventListener("blur", () => {
+  const d = $("nTel").value.replace(/\D/g,"").replace(/^55(?=\d{10,11}$)/,"");
+  if (d.length === 11) $("nTel").value = `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+  else if (d.length === 10) $("nTel").value = `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
+});
+$("fn").onsubmit = async e => {
+  e.preventDefault();
+  const sv = servicos.find(s => String(s.id) === $("nSv").value);
+  const tel = $("nTel").value.replace(/\D/g,"");
+  if (tel.length < 10) return toast("Confira o WhatsApp com DDD");
+  if (!sv || !$("nHora").value) return toast("Escolha o procedimento e o horário");
+  const ini = toMin($("nHora").value), fim = ini + sv.duracao_min;
+  if (fim >= 24*60) return toast("Horário inválido");
+  const hr = horarios.find(h => h.dia_semana === dt($("nDia").value).getDay());
+  const fora = !hr || !hr.aberto || ini < toMin(hm(hr.inicio)) || fim > toMin(hm(hr.fim)) ||
+    (hr.pausa_inicio && hr.pausa_fim && ini < toMin(hm(hr.pausa_fim)) && fim > toMin(hm(hr.pausa_inicio)));
+  if (fora && !confirm("Esse horário está fora do expediente ou no intervalo. Marcar mesmo assim (encaixe)?")) return;
+  $("nBtn").disabled = true; $("nBtn").textContent = "Salvando…";
+  const { error } = await sb.from("agendamentos").insert({
+    servico_id: sv.id, data: $("nDia").value, inicio: $("nHora").value, fim: toHM(fim),
+    nome: $("nNome").value.trim(), telefone: $("nTel").value.trim(),
+    observacao: ["Agendado pelo painel", $("nObs").value.trim()].filter(Boolean).join(" · "),
+    status: $("nConf").checked ? "confirmado" : "agendado"
+  });
+  $("nBtn").disabled = false; $("nBtn").textContent = "Salvar agendamento";
+  if (error){ toast(/sem_conflito|exclu|overlap|conflict/i.test(error.message) ? "Já tem alguém nesse horário" : "Erro: " + error.message); carregarSlots(); return; }
+  toast("Agendado ✓"); avisar();
+  const dia = $("nDia").value;
+  ["nNome","nTel","nObs","nHora"].forEach(id => $(id).value = "");
+  $("dia").value = dia; modo = "dia"; document.querySelectorAll("#t-ag .seg button").forEach(x => x.classList.toggle("on", x.dataset.modo==="dia"));
+  abrirAba("ag"); carregarAg();
+};
 
 /* ---- pedidos da Lis ---- */
 let pdFiltro = "novo";
